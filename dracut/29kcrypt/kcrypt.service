@@ -1,0 +1,9 @@
+[Unit]
+Description=kcrypt mount
+DefaultDependencies=no
+Before=cos-immutable-rootfs.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=no
+ExecStart=/sbin/kcrypt-mount-local
