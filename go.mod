@@ -1,4 +1,4 @@
-module github.com/keirros-io/kcrypt
+module github.com/kairos-io/kcrypt
 
 go 1.18
 

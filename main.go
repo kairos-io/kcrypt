@@ -14,7 +14,7 @@ import (
 	multierror "github.com/hashicorp/go-multierror"
 	"github.com/jaypipes/ghw"
 	"github.com/jaypipes/ghw/pkg/block"
-	"github.com/keirros-io/kcrypt/pkg/bus"
+	"github.com/kairos-io/kcrypt/pkg/bus"
 	"github.com/mudler/go-pluggable"
 	cp "github.com/otiai10/copy"
 	"github.com/urfave/cli"

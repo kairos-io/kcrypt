@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/jaypipes/ghw/pkg/block"
-	"github.com/keirros-io/kcrypt/pkg/bus"
+	"github.com/kairos-io/kcrypt/pkg/bus"
 
 	"github.com/mudler/go-pluggable"
 )
