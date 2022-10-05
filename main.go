@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -47,19 +46,11 @@ func luksUnlock(device, mapper, password string) error {
 	}
 	defer dev.Close()
 
-	// set LUKS flags before unlocking the volume
-	if err := dev.FlagsAdd(luks.FlagAllowDiscards); err != nil {
-		log.Print(err)
-	}
-
-	// UnsealVolume+SetupMapper is equivalent of `cryptsetup open /dev/sda1 volumename`
-	volume, err := dev.UnsealVolume(0, []byte(password))
-	if err == luks.ErrPassphraseDoesNotMatch {
-		return fmt.Errorf("incorrect password")
-	} else if err != nil {
+	err = dev.Unlock(0, []byte(password), mapper)
+	if err != nil {
 		return err
 	}
-	return volume.SetupMapper(mapper)
+	return nil
 }
 
 func unlockDisk(b *block.Partition) error {
@@ -68,7 +59,7 @@ func unlockDisk(b *block.Partition) error {
 		return fmt.Errorf("error retreiving password remotely: %w", err)
 	}
 
-	return luksUnlock(fmt.Sprintf("/dev/%s", b.Name), b.UUID, pass)
+	return luksUnlock(fmt.Sprintf("/dev/%s", b.Name), b.Name, pass)
 }
 
 func createLuks(dev, password, version string, cryptsetupArgs ...string) error {
@@ -124,11 +115,11 @@ func luksify(label string) error {
 		return err
 	}
 
-	if err := luksUnlock(persistent, b.UUID, pass); err != nil {
+	if err := luksUnlock(persistent, b.Name, pass); err != nil {
 		return err
 	}
 
-	out, err := sh(fmt.Sprintf("mkfs.ext4 %s -n %s", b.UUID, label))
+	out, err := sh(fmt.Sprintf("mkfs.ext4 %s -L %s", fmt.Sprintf("/dev/mapper/%s", b.Name), label))
 
 	if err != nil {
 		return fmt.Errorf("err: %w, out: %s", err, out)
