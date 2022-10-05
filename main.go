@@ -125,6 +125,11 @@ func luksify(label string) error {
 		return fmt.Errorf("err: %w, out: %s", err, out)
 	}
 
+	out2, err := sh(fmt.Sprintf("cryptsetup close %s", b.Name))
+	if err != nil {
+		return fmt.Errorf("err: %w, out: %s", err, out2)
+	}
+
 	return nil
 }
 
