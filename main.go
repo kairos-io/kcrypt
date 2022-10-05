@@ -111,7 +111,7 @@ func luksify(label string) error {
 
 	persistent = fmt.Sprintf("/dev/%s", persistent)
 
-	if err := createLuks(persistent, pass, "luks2"); err != nil {
+	if err := createLuks(persistent, pass, "luks1"); err != nil {
 		return err
 	}
 
