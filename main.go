@@ -161,8 +161,8 @@ func sh(c string) (string, error) {
 }
 
 const (
-	GZType = "gz"
-	XZType = "xz"
+	GZType   = "gz"
+	XZType   = "xz"
 	LZMAType = "lzma"
 )
 
@@ -176,8 +176,8 @@ func detect(archive string) (string, error) {
 	if strings.Contains(out, "xz") {
 		return XZType, nil
 
-		} else if strings.Contains(out, "lzma") {
-			return LZMAType, nil
+	} else if strings.Contains(out, "lzma") {
+		return LZMAType, nil
 
 	} else if strings.Contains(out, "gz") {
 		return GZType, nil
@@ -207,7 +207,7 @@ func extractInitrd(initrd string, dst string) error {
 }
 
 func createInitrd(initrd string, src string, format string) error {
-	fmt.Printf("Creating '%s' from '%s' as '%s'\n",initrd, src,format)
+	fmt.Printf("Creating '%s' from '%s' as '%s'\n", initrd, src, format)
 
 	if _, err := os.Stat(src); err != nil {
 		return err
@@ -230,7 +230,7 @@ func createInitrd(initrd string, src string, format string) error {
 
 func injectInitrd(initrd string, file, dst string) error {
 
-    fmt.Printf("Injecting '%s' as '%s' into '%s'\n",file, dst,initrd)
+	fmt.Printf("Injecting '%s' as '%s' into '%s'\n", file, dst, initrd)
 	format, err := detect(initrd)
 	if err != nil {
 		return err
@@ -241,13 +241,13 @@ func injectInitrd(initrd string, file, dst string) error {
 	}
 	defer os.RemoveAll(tmp)
 
-    fmt.Printf("Extracting '%s' in '%s' ...\n",initrd, tmp)
+	fmt.Printf("Extracting '%s' in '%s' ...\n", initrd, tmp)
 	if err := extractInitrd(initrd, tmp); err != nil {
 		return fmt.Errorf("cannot extract initrd, %s", err)
 	}
 
-	d:=filepath.Join(tmp, dst)
-	fmt.Printf("Copying '%s' in '%s' ...\n",file, d)
+	d := filepath.Join(tmp, dst)
+	fmt.Printf("Copying '%s' in '%s' ...\n", file, d)
 	if err := cp.Copy(file, d); err != nil {
 		return fmt.Errorf("cannot copy file, %s", err)
 	}
@@ -279,13 +279,13 @@ func unlockAll() error {
 
 func main() {
 	app := &cli.App{
-		Name:    "keiros-kcrypt",
-		Version: "0.1",
-		Author:  "Ettore Di Giacinto",
-		Usage:   "keiros escrow key agent component",
+		Name:        "keiros-kcrypt",
+		Version:     "0.1",
+		Author:      "Ettore Di Giacinto",
+		Usage:       "keiros escrow key agent component",
 		Description: ``,
-		UsageText: ``,
-		Copyright: "Ettore Di Giacinto",
+		UsageText:   ``,
+		Copyright:   "Ettore Di Giacinto",
 		Commands: []cli.Command{
 			{
 
