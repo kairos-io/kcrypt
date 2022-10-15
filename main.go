@@ -136,7 +136,7 @@ func luksify(label string) error {
 		return err
 	}
 
-	out, err := sh(fmt.Sprintf("mkfs.ext4 %s -L %s", devMapper, label))
+	out, err := sh(fmt.Sprintf("mkfs.ext4 -L %s %s", label, devMapper))
 
 	if err != nil {
 		return fmt.Errorf("err: %w, out: %s", err, out)
