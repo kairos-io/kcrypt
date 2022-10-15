@@ -19,6 +19,18 @@ import (
 	"github.com/urfave/cli"
 )
 
+func waitdevice(device string, attempts int) error {
+	for tries := 0; tries < attempts; tries++ {
+		sh("udevadm settle")
+		_, err := os.Lstat(device)
+		if !os.IsNotExist(err) {
+			return nil
+		}
+		time.Sleep(1 * time.Second)
+	}
+	return fmt.Errorf("no device found")
+}
+
 // TODO: Ask to discovery a pass to unlock. keep waiting until we get it and a timeout is exhausted with retrials (exp backoff)
 func getPassword(b *block.Partition) (password string, err error) {
 	bus.Reload()
@@ -110,6 +122,7 @@ func luksify(label string) error {
 	}
 
 	persistent = fmt.Sprintf("/dev/%s", persistent)
+	devMapper := fmt.Sprintf("/dev/mapper/%s", b.Name)
 
 	if err := createLuks(persistent, pass, "luks1"); err != nil {
 		return err
@@ -119,7 +132,11 @@ func luksify(label string) error {
 		return err
 	}
 
-	out, err := sh(fmt.Sprintf("mkfs.ext4 %s -L %s", fmt.Sprintf("/dev/mapper/%s", b.Name), label))
+	if err := waitdevice(devMapper, 10); err != nil {
+		return err
+	}
+
+	out, err := sh(fmt.Sprintf("mkfs.ext4 %s -L %s", devMapper, label))
 
 	if err != nil {
 		return fmt.Errorf("err: %w, out: %s", err, out)
