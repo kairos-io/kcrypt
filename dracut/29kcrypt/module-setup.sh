@@ -31,8 +31,14 @@ install() {
     #inst_hook pre-trigger 10 "$moddir/mount-local.sh"
     inst_simple "${moddir}/kcrypt.service" \
         "${systemdsystemunitdir}/kcrypt.service"
+
+    inst_simple "${moddir}/kcrypt-online.service" \
+        "${systemdsystemunitdir}/kcrypt-online.service"
+
     mkdir -p "${initdir}/${systemdsystemunitdir}/initrd-fs.target.requires"
     ln_r "../kcrypt.service" \
         "${systemdsystemunitdir}/initrd-fs.target.requires/kcrypt.service"
+    ln_r "../kcrypt-online.service" \
+        "${systemdsystemunitdir}/initrd-fs.target.requires/kcrypt-online.service"
     dracut_need_initqueue
 }
