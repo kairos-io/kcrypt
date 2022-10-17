@@ -28,7 +28,7 @@ type Bus struct {
 
 func (b *Bus) LoadProviders() {
 	wd, _ := os.Getwd()
-	b.Manager.Autoload("kcrypt-discovery", "/system/discovery", "/oem/kcrypt", wd).Register()
+	b.Manager.Autoload("kcrypt-discovery", "/system/discovery", "/oem/kcrypt", "/oem/system/discovery", wd).Register()
 }
 
 func (b *Bus) Initialize() {
