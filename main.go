@@ -109,45 +109,50 @@ func createDiskImage() (*os.File, error) {
 // this function should delete COS_PERSISTENT. delete the partition and create a luks+type in place.
 
 // Take a part label, and recreates it with LUKS. IT OVERWRITES DATA!
-func luksify(label string) error {
+// On success, it returns a machine parseable string with the partition information
+// (label:name:uuid) so that it can be stored by the caller for later use.
+// This is because the label of the encrypted partition is not accessible unless
+// the partition is decrypted first and the uuid changed after encryption so
+// any stored information needs to be updated (by the caller).
+func luksify(label string) (string, error) {
 	// blkid
 	persistent, b, err := findPartition(label)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	pass, err := getPassword(b)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	persistent = fmt.Sprintf("/dev/%s", persistent)
 	devMapper := fmt.Sprintf("/dev/mapper/%s", b.Name)
 
 	if err := createLuks(persistent, pass, "luks1"); err != nil {
-		return err
+		return "", err
 	}
 
 	if err := luksUnlock(persistent, b.Name, pass); err != nil {
-		return err
+		return "", err
 	}
 
 	if err := waitdevice(devMapper, 10); err != nil {
-		return err
+		return "", err
 	}
 
 	out, err := sh(fmt.Sprintf("mkfs.ext4 -L %s %s", label, devMapper))
 
 	if err != nil {
-		return fmt.Errorf("err: %w, out: %s", err, out)
+		return "", fmt.Errorf("err: %w, out: %s", err, out)
 	}
 
 	out2, err := sh(fmt.Sprintf("cryptsetup close %s", b.Name))
 	if err != nil {
-		return fmt.Errorf("err: %w, out: %s", err, out2)
+		return "", fmt.Errorf("err: %w, out: %s", err, out2)
 	}
 
-	return nil
+	return fmt.Sprintf("%s:%s:%s", b.Label, b.Name, b.UUID), nil
 }
 
 func findPartition(label string) (string, *block.Partition, error) {
@@ -318,7 +323,12 @@ func main() {
 					if c.NArg() != 1 {
 						return fmt.Errorf("requires 1 arg, the partition label")
 					}
-					return luksify(c.Args().First())
+					out, err := luksify(c.Args().First())
+					if err != nil {
+						return err
+					}
+					fmt.Println(out)
+					return nil
 				},
 			},
 			{
