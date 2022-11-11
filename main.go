@@ -17,6 +17,8 @@ import (
 	"github.com/mudler/go-pluggable"
 	cp "github.com/otiai10/copy"
 	"github.com/urfave/cli"
+
+	pi "github.com/kairos-io/kcrypt/pkg/partition_info"
 )
 
 func waitdevice(device string, attempts int) error {
@@ -109,45 +111,50 @@ func createDiskImage() (*os.File, error) {
 // this function should delete COS_PERSISTENT. delete the partition and create a luks+type in place.
 
 // Take a part label, and recreates it with LUKS. IT OVERWRITES DATA!
-func luksify(label string) error {
+// On success, it returns a machine parseable string with the partition information
+// (label:name:uuid) so that it can be stored by the caller for later use.
+// This is because the label of the encrypted partition is not accessible unless
+// the partition is decrypted first and the uuid changed after encryption so
+// any stored information needs to be updated (by the caller).
+func luksify(label string) (string, error) {
 	// blkid
 	persistent, b, err := findPartition(label)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	pass, err := getPassword(b)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	persistent = fmt.Sprintf("/dev/%s", persistent)
 	devMapper := fmt.Sprintf("/dev/mapper/%s", b.Name)
 
 	if err := createLuks(persistent, pass, "luks1"); err != nil {
-		return err
+		return "", err
 	}
 
 	if err := luksUnlock(persistent, b.Name, pass); err != nil {
-		return err
+		return "", err
 	}
 
 	if err := waitdevice(devMapper, 10); err != nil {
-		return err
+		return "", err
 	}
 
 	out, err := sh(fmt.Sprintf("mkfs.ext4 -L %s %s", label, devMapper))
 
 	if err != nil {
-		return fmt.Errorf("err: %w, out: %s", err, out)
+		return "", fmt.Errorf("err: %w, out: %s", err, out)
 	}
 
 	out2, err := sh(fmt.Sprintf("cryptsetup close %s", b.Name))
 	if err != nil {
-		return fmt.Errorf("err: %w, out: %s", err, out2)
+		return "", fmt.Errorf("err: %w, out: %s", err, out2)
 	}
 
-	return nil
+	return pi.PartitionToString(b), nil
 }
 
 func findPartition(label string) (string, *block.Partition, error) {
@@ -272,11 +279,17 @@ func injectInitrd(initrd string, file, dst string) error {
 func unlockAll() error {
 	bus.Manager.Initialize()
 
+	partitionInfo, err := pi.NewPartitionInfoFromFile(pi.DefaultPartitionInfoFile)
+	if err != nil {
+		return err
+	}
+
 	block, err := ghw.Block()
 	if err == nil {
 		for _, disk := range block.Disks {
 			for _, p := range disk.Partitions {
 				if p.Type == "crypto_LUKS" {
+					p.Label = partitionInfo.LookupLabelForUUID(p.UUID)
 					fmt.Printf("Unmounted Luks found at '%s' LABEL '%s' \n", p.Name, p.Label)
 					err = multierror.Append(err, unlockDisk(p))
 					if err != nil {
@@ -318,7 +331,12 @@ func main() {
 					if c.NArg() != 1 {
 						return fmt.Errorf("requires 1 arg, the partition label")
 					}
-					return luksify(c.Args().First())
+					out, err := luksify(c.Args().First())
+					if err != nil {
+						return err
+					}
+					fmt.Println(out)
+					return nil
 				},
 			},
 			{
