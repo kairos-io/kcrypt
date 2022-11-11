@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"os"
 
+	"github.com/jaypipes/ghw/pkg/block"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
@@ -97,6 +98,38 @@ TO_BE_UPDATED: new_uuid_1
 TO_KEEP: old_uuid_1
 `
 			Expect(string(dat)).To(Equal(expectedContent))
+		})
+	})
+
+	Describe("PartitionToString", func() {
+		var partition *block.Partition
+
+		BeforeEach(func() {
+			partition = &block.Partition{
+				Disk:       nil,
+				Name:       "sda1",
+				Label:      "COS_PERSISTENT",
+				MountPoint: "/mnt/sda1",
+				UUID:       "some_uuid_here",
+			}
+		})
+
+		It("returns a string representation of the partition data", func() {
+			Expect(pi.PartitionToString(partition)).To(Equal("COS_PERSISTENT:sda1:some_uuid_here"))
+		})
+	})
+
+	Describe("PartitionDataFromString", func() {
+		var partitionData string
+
+		BeforeEach(func() {
+			partitionData = "THE_LABEL:the_name:the_uuid"
+		})
+
+		It("returns the label and the uuid", func() {
+			label, uuid := pi.PartitionDataFromString(partitionData)
+			Expect(label).To(Equal("THE_LABEL"))
+			Expect(uuid).To(Equal("the_uuid"))
 		})
 	})
 })

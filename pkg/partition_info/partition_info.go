@@ -1,9 +1,11 @@
 package partition_info
 
 import (
+	"fmt"
 	"io/ioutil"
 	"strings"
 
+	"github.com/jaypipes/ghw/pkg/block"
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v3"
 )
@@ -15,6 +17,18 @@ import (
 // and make the request.
 type PartitionInfo map[string]string
 
+func PartitionToString(p *block.Partition) string {
+	return fmt.Sprintf("%s:%s:%s", p.Label, p.Name, p.UUID)
+}
+
+// Takes a partition info string (as returned by PartitionToString) and return
+// the partition label and the UUID
+func PartitionDataFromString(partitionStr string) (string, string) {
+	parts := strings.Split(partitionStr, ":")
+
+	return parts[0], parts[2]
+}
+
 // UpdatePartitionLabelMapping takes partition information as a string argument
 // the the form: `label:name:uuid` (that's what the `kcrypt encrypt` command returns
 // on success. This function stores it in the PartitionInfoFile yaml file for
@@ -25,8 +39,8 @@ func UpdatePartitionLabelMapping(partitionData, file string) error {
 		return err
 	}
 
-	parts := strings.Split(partitionData, ":")
-	partitionInfo[parts[0]] = parts[2]
+	label, uuid := PartitionDataFromString(partitionData)
+	partitionInfo[label] = uuid
 
 	return UpdatePartitionInfoFile(partitionInfo, file)
 }

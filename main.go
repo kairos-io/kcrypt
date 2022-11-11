@@ -17,6 +17,8 @@ import (
 	"github.com/mudler/go-pluggable"
 	cp "github.com/otiai10/copy"
 	"github.com/urfave/cli"
+
+	pi "github.com/kairos-io/kcrypt/pkg/partition_info"
 )
 
 func waitdevice(device string, attempts int) error {
@@ -152,7 +154,7 @@ func luksify(label string) (string, error) {
 		return "", fmt.Errorf("err: %w, out: %s", err, out2)
 	}
 
-	return fmt.Sprintf("%s:%s:%s", b.Label, b.Name, b.UUID), nil
+	return pi.PartitionToString(b), nil
 }
 
 func findPartition(label string) (string, *block.Partition, error) {
