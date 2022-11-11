@@ -38,6 +38,16 @@ func (pi PartitionInfo) LookupUUIDForLabel(l string) string {
 	return pi.mapping[l]
 }
 
+func (pi PartitionInfo) LookupLabelForUUID(uuid string) string {
+	for k, v := range pi.mapping {
+		if v == uuid {
+			return k
+		}
+	}
+
+	return ""
+}
+
 // UpdatePartitionLabelMapping takes partition information as a string argument
 // the the form: `label:name:uuid` (that's what the `kcrypt encrypt` command returns
 // on success. This function stores it in the PartitionInfoFile yaml file for

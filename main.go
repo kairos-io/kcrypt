@@ -279,11 +279,17 @@ func injectInitrd(initrd string, file, dst string) error {
 func unlockAll() error {
 	bus.Manager.Initialize()
 
+	partitionInfo, err := pi.NewPartitionInfoFromFile(pi.DefaultPartitionInfoFile)
+	if err != nil {
+		return err
+	}
+
 	block, err := ghw.Block()
 	if err == nil {
 		for _, disk := range block.Disks {
 			for _, p := range disk.Partitions {
 				if p.Type == "crypto_LUKS" {
+					p.Label = partitionInfo.LookupLabelForUUID(p.UUID)
 					fmt.Printf("Unmounted Luks found at '%s' LABEL '%s' \n", p.Name, p.Label)
 					err = multierror.Append(err, unlockDisk(p))
 					if err != nil {

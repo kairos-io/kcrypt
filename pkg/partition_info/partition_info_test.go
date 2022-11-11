@@ -121,9 +121,36 @@ TO_KEEP: old_uuid_1
 			Expect(err).ToNot(HaveOccurred())
 		})
 
-		It("parses the file correctly", func() {
+		It("returns the correct UUID", func() {
 			uuid := partitionInfo.LookupUUIDForLabel("COS_PERSISTENT")
 			Expect(uuid).To(Equal("some_uuid_1"))
+		})
+
+		It("returns an empty UUID when the label is not found", func() {
+			uuid := partitionInfo.LookupUUIDForLabel("DOESNT_EXIST")
+			Expect(uuid).To(Equal(""))
+		})
+	})
+
+	Describe("LookupLabelForUUID", func() {
+		var file string
+		var partitionInfo *pi.PartitionInfo
+		var err error
+
+		BeforeEach(func() {
+			file = "../../tests/assets/partition_info.yaml"
+			partitionInfo, err = pi.NewPartitionInfoFromFile(file)
+			Expect(err).ToNot(HaveOccurred())
+		})
+
+		It("returns the correct label", func() {
+			uuid := partitionInfo.LookupLabelForUUID("some_uuid_1")
+			Expect(uuid).To(Equal("COS_PERSISTENT"))
+		})
+
+		It("returns an empty label when UUID doesn't exist", func() {
+			uuid := partitionInfo.LookupLabelForUUID("doesnt_exist")
+			Expect(uuid).To(Equal(""))
 		})
 	})
 })
