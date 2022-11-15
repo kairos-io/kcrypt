@@ -21,6 +21,8 @@ import (
 	pi "github.com/kairos-io/kcrypt/pkg/partition_info"
 )
 
+var Version = "v0.0.0-dev"
+
 func waitdevice(device string, attempts int) error {
 	for tries := 0; tries < attempts; tries++ {
 		sh("udevadm settle")
@@ -279,7 +281,7 @@ func injectInitrd(initrd string, file, dst string) error {
 func unlockAll() error {
 	bus.Manager.Initialize()
 
-	partitionInfo, err := pi.NewPartitionInfoFromFile(pi.DefaultPartitionInfoFile)
+	partitionInfo, _, err := pi.NewPartitionInfoFromFile(pi.DefaultPartitionInfoFile)
 	if err != nil {
 		return err
 	}
@@ -305,10 +307,10 @@ func unlockAll() error {
 
 func main() {
 	app := &cli.App{
-		Name:        "keiros-kcrypt",
-		Version:     "0.1",
+		Name:        "kairos-kcrypt",
+		Version:     Version,
 		Author:      "Ettore Di Giacinto",
-		Usage:       "keiros escrow key agent component",
+		Usage:       "kairos escrow key agent component",
 		Description: ``,
 		UsageText:   ``,
 		Copyright:   "Ettore Di Giacinto",
