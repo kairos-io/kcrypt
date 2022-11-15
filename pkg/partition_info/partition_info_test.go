@@ -38,13 +38,15 @@ var _ = Describe("Partition Info file parsing", func() {
 					fmt.Sprintf("partition-info-%d.yaml", time.Now().UnixNano()))
 			})
 
-			It("creates the file and returns 'false' and an (empty) mapping", func() {
+			It("creates the file and returns 'false' and a non nil mapping", func() {
 				result, existed, err := pi.NewPartitionInfoFromFile(fileName)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(result).ToNot(BeNil())
 				Expect(existed).To(BeFalse())
 				_, err = os.Stat(fileName)
 				Expect(err).ToNot(HaveOccurred())
+				Expect(result).ToNot(BeNil())
+				Expect(result.IsMappingNil()).To(BeFalse())
 			})
 		})
 	})
