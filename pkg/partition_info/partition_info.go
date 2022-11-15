@@ -3,6 +3,7 @@ package partition_info
 import (
 	"fmt"
 	"io/ioutil"
+	"os"
 	"strings"
 
 	"github.com/jaypipes/ghw/pkg/block"
@@ -22,16 +23,27 @@ type PartitionInfo struct {
 	mapping map[string]string
 }
 
-func NewPartitionInfoFromFile(file string) (*PartitionInfo, error) {
+// NewPartitionInfoFromFile reads the given partition info file (if one exists)
+// and returns a pointer to a PartitionInfo object.
+// If a file doesn't exist, the function will create one and return an "empty"
+// PartitionInfo object.
+// The boolean return value indicates whether a file existed or not (true means,
+// a file existed already).
+func NewPartitionInfoFromFile(file string) (*PartitionInfo, bool, error) {
+	existed, err := createInfoFileIfNotExists(file)
+	if err != nil {
+		return nil, existed, err
+	}
+
 	mapping, err := ParsePartitionInfoFile(file)
 	if err != nil {
-		return nil, err
+		return nil, existed, err
 	}
 
 	return &PartitionInfo{
 		file:    file,
 		mapping: mapping,
-	}, nil
+	}, existed, nil
 }
 
 func (pi PartitionInfo) LookupUUIDForLabel(l string) string {
@@ -97,4 +109,17 @@ func ParsePartitionInfoFile(file string) (map[string]string, error) {
 	}
 
 	return result, nil
+}
+
+// createInfoFileIfNotExists returns true if file already exists or creates the
+// the file if it doesn't exist and returns false.
+func createInfoFileIfNotExists(fileName string) (bool, error) {
+	_, err := os.Stat(fileName)
+	if errors.Is(err, os.ErrNotExist) {
+		if _, err := os.Create(fileName); err != nil {
+			return false, err
+		}
+		return false, nil
+	}
+	return true, nil
 }

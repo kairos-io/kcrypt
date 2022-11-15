@@ -1,8 +1,11 @@
 package partition_info_test
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
+	"path"
+	"time"
 
 	"github.com/jaypipes/ghw/pkg/block"
 	. "github.com/onsi/ginkgo/v2"
@@ -18,11 +21,31 @@ var _ = Describe("Partition Info file parsing", func() {
 		BeforeEach(func() {
 			file = "../../tests/assets/partition_info.yaml"
 		})
+		When("the files exists already", func() {
+			It("returns 'true' and a PartitionInfo object", func() {
+				result, existed, err := pi.NewPartitionInfoFromFile(file)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(result).ToNot(BeNil())
+				Expect(existed).To(BeTrue())
+			})
+		})
 
-		It("returns a PartitionInfo", func() {
-			result, err := pi.NewPartitionInfoFromFile(file)
-			Expect(err).ToNot(HaveOccurred())
-			Expect(result).ToNot(BeNil())
+		When("a file doesn't exist", func() {
+			var fileName string
+			BeforeEach(func() {
+				fileName = path.Join(
+					os.TempDir(),
+					fmt.Sprintf("partition-info-%d.yaml", time.Now().UnixNano()))
+			})
+
+			It("creates the file and returns 'false' and an (empty) mapping", func() {
+				result, existed, err := pi.NewPartitionInfoFromFile(fileName)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(result).ToNot(BeNil())
+				Expect(existed).To(BeFalse())
+				_, err = os.Stat(fileName)
+				Expect(err).ToNot(HaveOccurred())
+			})
 		})
 	})
 
@@ -86,7 +109,7 @@ var _ = Describe("Partition Info file parsing", func() {
 			_, err = file.Write([]byte("TO_KEEP: old_uuid_1"))
 			Expect(err).ToNot(HaveOccurred())
 
-			partitionInfo, err = pi.NewPartitionInfoFromFile(file.Name())
+			partitionInfo, _, err = pi.NewPartitionInfoFromFile(file.Name())
 			Expect(err).ToNot(HaveOccurred())
 		})
 
@@ -117,7 +140,7 @@ TO_KEEP: old_uuid_1
 
 		BeforeEach(func() {
 			file = "../../tests/assets/partition_info.yaml"
-			partitionInfo, err = pi.NewPartitionInfoFromFile(file)
+			partitionInfo, _, err = pi.NewPartitionInfoFromFile(file)
 			Expect(err).ToNot(HaveOccurred())
 		})
 
@@ -139,7 +162,7 @@ TO_KEEP: old_uuid_1
 
 		BeforeEach(func() {
 			file = "../../tests/assets/partition_info.yaml"
-			partitionInfo, err = pi.NewPartitionInfoFromFile(file)
+			partitionInfo, _, err = pi.NewPartitionInfoFromFile(file)
 			Expect(err).ToNot(HaveOccurred())
 		})
 
