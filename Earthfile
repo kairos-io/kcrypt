@@ -6,9 +6,11 @@ ARG BASE_IMAGE=quay.io/kairos/core-opensuse
 
 build-kcrypt:
     FROM golang:alpine
+    RUN apk add git
     COPY . /work
     WORKDIR /work
-    RUN CGO_ENABLED=0 go build -o kcrypt
+    ARG VERSION="$(git describe --tags)"
+    RUN CGO_ENABLED=0 go build -o kcrypt -ldflags "-X main.Version=$VERSION"
     SAVE ARTIFACT /work/kcrypt AS LOCAL kcrypt
 
 build-dracut:
