@@ -71,6 +71,10 @@ func (pi PartitionInfo) UpdateMapping(partitionData string) error {
 	return pi.save()
 }
 
+func (pi PartitionInfo) IsMappingNil() bool {
+	return pi.mapping == nil
+}
+
 func (pi PartitionInfo) save() error {
 	data, err := yaml.Marshal(&pi.mapping)
 	if err != nil {
@@ -106,6 +110,9 @@ func ParsePartitionInfoFile(file string) (map[string]string, error) {
 	err = yaml.Unmarshal(yamlFile, &result)
 	if err != nil {
 		return result, errors.Wrap(err, "unmarshalling partition info file")
+	}
+	if result == nil {
+		result = map[string]string{}
 	}
 
 	return result, nil
