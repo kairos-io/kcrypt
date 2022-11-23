@@ -16,6 +16,7 @@ neednet="rd.neednet"
     echo "DefaultDependencies=no"
     echo "Description=kcrypt online mount"
     echo "Before=cos-immutable-rootfs.service"
+    echo "Conflicts=initrd-switch-root.target"
     if getargbool 0 $neednet; then
         echo "Wants=network-online.target"
         echo "After=network-online.target"
@@ -24,6 +25,7 @@ neednet="rd.neednet"
     if [ -n "${oem_label}" ]; then
         echo "After=oem.mount"
     fi
+    echo "After=sysroot.mount"
     echo "[Service]"
     echo "Type=oneshot"
     echo "RemainAfterExit=no"
