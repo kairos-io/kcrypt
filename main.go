@@ -283,7 +283,7 @@ func unlockAll() error {
 
 	partitionInfo, _, err := pi.NewPartitionInfoFromFile(pi.DefaultPartitionInfoFile)
 	if err != nil {
-		return err
+		fmt.Printf("Partition file not found '%s' \n", pi.DefaultPartitionInfoFile)
 	}
 
 	block, err := ghw.Block()
@@ -291,7 +291,9 @@ func unlockAll() error {
 		for _, disk := range block.Disks {
 			for _, p := range disk.Partitions {
 				if p.Type == "crypto_LUKS" {
-					p.Label = partitionInfo.LookupLabelForUUID(p.UUID)
+				        if partitionInfo != nil {
+					  p.Label = partitionInfo.LookupLabelForUUID(p.UUID)
+					}
 					fmt.Printf("Unmounted Luks found at '%s' LABEL '%s' \n", p.Name, p.Label)
 					err = multierror.Append(err, unlockDisk(p))
 					if err != nil {
@@ -302,7 +304,7 @@ func unlockAll() error {
 			}
 		}
 	}
-	return err
+	return nil
 }
 
 func main() {

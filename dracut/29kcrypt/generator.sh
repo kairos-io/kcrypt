@@ -8,18 +8,19 @@ GENERATOR_DIR="$2"
 [ -d "$GENERATOR_DIR" ] || mkdir "$GENERATOR_DIR"
 
 oem_label=$(getarg rd.cos.oemlabel=)
-neednet="rd.neednet"
 
 # See https://github.com/kairos-io/packages/blob/d12b12b043a71d8471454f7b4fc84c3181d2bf60/packages/system/dracut/immutable-rootfs/30cos-immutable-rootfs/cos-generator.sh#L29
 {
     echo "[Unit]"
     echo "DefaultDependencies=no"
-    echo "Description=kcrypt online mount"
     echo "Before=cos-immutable-rootfs.service"
     echo "Conflicts=initrd-switch-root.target"
-    if getargbool 0 $neednet; then
+    if getargbool 0 rd.neednet; then
         echo "Wants=network-online.target"
         echo "After=network-online.target"
+        echo "Description=kcrypt online mount"
+    else
+        echo "Description=kcrypt mount"
     fi
     # OEM is special as kcrypt plugins might need that in order to unlock other partitions and plugins can reside in /oem as well and kcrypt needs to find them
     if [ -n "${oem_label}" ]; then
