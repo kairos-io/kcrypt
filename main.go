@@ -283,26 +283,32 @@ func unlockAll() error {
 
 	partitionInfo, _, err := pi.NewPartitionInfoFromFile(pi.DefaultPartitionInfoFile)
 	if err != nil {
-		return err
+		fmt.Printf("Warning: Partition file not found '%s' \n", pi.DefaultPartitionInfoFile)
 	}
 
 	block, err := ghw.Block()
-	if err == nil {
-		for _, disk := range block.Disks {
-			for _, p := range disk.Partitions {
-				if p.Type == "crypto_LUKS" {
+	if err != nil {
+		fmt.Printf("Warning: Error reading partitions '%s \n", err.Error())
+
+		return nil
+	}
+
+	for _, disk := range block.Disks {
+		for _, p := range disk.Partitions {
+			if p.Type == "crypto_LUKS" {
+				if partitionInfo != nil {
 					p.Label = partitionInfo.LookupLabelForUUID(p.UUID)
-					fmt.Printf("Unmounted Luks found at '%s' LABEL '%s' \n", p.Name, p.Label)
-					err = multierror.Append(err, unlockDisk(p))
-					if err != nil {
-						fmt.Printf("Unlocking failed: '%s'\n", err.Error())
-					}
-					time.Sleep(10 * time.Second)
 				}
+				fmt.Printf("Unmounted Luks found at '%s' LABEL '%s' \n", p.Name, p.Label)
+				err = multierror.Append(err, unlockDisk(p))
+				if err != nil {
+					fmt.Printf("Unlocking failed: '%s'\n", err.Error())
+				}
+				time.Sleep(10 * time.Second)
 			}
 		}
 	}
-	return err
+	return nil
 }
 
 func main() {

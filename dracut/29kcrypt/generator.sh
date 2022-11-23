@@ -7,31 +7,32 @@ GENERATOR_DIR="$2"
 [ -z "$GENERATOR_DIR" ] && exit 1
 [ -d "$GENERATOR_DIR" ] || mkdir "$GENERATOR_DIR"
 
-if getargbool 0 rd.neednet; then
-    {
-        echo "[Unit]"
-        echo "DefaultDependencies=no"
-        echo "Description=kcrypt online mount"
-        echo "Before=cos-immutable-rootfs.service"
-        echo "After=network-online.target"
+oem_label=$(getarg rd.cos.oemlabel=)
+
+# See https://github.com/kairos-io/packages/blob/d12b12b043a71d8471454f7b4fc84c3181d2bf60/packages/system/dracut/immutable-rootfs/30cos-immutable-rootfs/cos-generator.sh#L29
+{
+    echo "[Unit]"
+    echo "DefaultDependencies=no"
+    echo "Before=cos-immutable-rootfs.service"
+    echo "Conflicts=initrd-switch-root.target"
+    if getargbool 0 rd.neednet; then
         echo "Wants=network-online.target"
-        echo "[Service]"
-        echo "Type=oneshot"
-        echo "RemainAfterExit=no"
-        echo "ExecStart=/sbin/kcrypt-mount-local"
-    } > "$GENERATOR_DIR"/kcrypt.service
-else
-    {
-        echo "[Unit]"
-        echo "DefaultDependencies=no"
+        echo "After=network-online.target"
+        echo "Description=kcrypt online mount"
+    else
         echo "Description=kcrypt mount"
-        echo "Before=cos-immutable-rootfs.service"
-        echo "[Service]"
-        echo "Type=oneshot"
-        echo "RemainAfterExit=no"
-        echo "ExecStart=/sbin/kcrypt-mount-local"
-    } > "$GENERATOR_DIR"/kcrypt.service
-fi
+    fi
+    # OEM is special as kcrypt plugins might need that in order to unlock other partitions and plugins can reside in /oem as well and kcrypt needs to find them
+    if [ -n "${oem_label}" ]; then
+        echo "After=oem.mount"
+    fi
+    echo "After=sysroot.mount"
+    echo "[Service]"
+    echo "Type=oneshot"
+    echo "RemainAfterExit=no"
+    echo "ExecStart=/usr/bin/kcrypt unlock-all"
+} > "$GENERATOR_DIR"/kcrypt.service
+
 
 if [ ! -e "$GENERATOR_DIR/initrd-fs.target.requires/kcrypt.service" ]; then
     mkdir -p "$GENERATOR_DIR"/initrd-fs.target.requires
