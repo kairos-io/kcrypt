@@ -38,6 +38,17 @@ var _ = Describe("Partition Info file parsing", func() {
 					fmt.Sprintf("partition-info-%d.yaml", time.Now().UnixNano()))
 			})
 
+			When("there is some error other than the file doesn't exist", func() {
+				It("returns 'false' and the error", func() {
+					// We are trying to write to a path that doesn't exist (not the file, the path).
+					// https://stackoverflow.com/a/66808328
+					fileName = "\000x"
+					_, _, err := pi.NewPartitionInfoFromFile(fileName)
+					Expect(err).To(HaveOccurred())
+					Expect(err.Error()).To(ContainSubstring("stat \000x: invalid argument"))
+				})
+			})
+
 			It("creates the file and returns 'false' and a non nil mapping", func() {
 				result, existed, err := pi.NewPartitionInfoFromFile(fileName)
 				Expect(err).ToNot(HaveOccurred())
