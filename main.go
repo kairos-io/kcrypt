@@ -283,7 +283,7 @@ func unlockAll() error {
 
 	partitionInfo, _, err := pi.NewPartitionInfoFromFile(pi.DefaultPartitionInfoFile)
 	if err != nil {
-		fmt.Printf("Partition file not found '%s' \n", pi.DefaultPartitionInfoFile)
+		fmt.Printf("Warning: Partition file not found '%s' \n", pi.DefaultPartitionInfoFile)
 	}
 
 	block, err := ghw.Block()
