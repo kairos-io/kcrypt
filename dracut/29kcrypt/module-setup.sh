@@ -27,8 +27,7 @@ install() {
 
     inst_multiple \
         kcrypt
-    inst_script "${moddir}/mount-local.sh" "/sbin/kcrypt-mount-local"
-    #inst_hook pre-trigger 10 "$moddir/mount-local.sh"
+
     inst_script "${moddir}/generator.sh" \
         "${systemdutildir}/system-generators/dracut-kcrypt-generator"
 

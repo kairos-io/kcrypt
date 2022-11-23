@@ -29,7 +29,7 @@ neednet="rd.neednet"
     echo "[Service]"
     echo "Type=oneshot"
     echo "RemainAfterExit=no"
-    echo "ExecStart=/sbin/kcrypt-mount-local"
+    echo "ExecStart=/usr/bin/kcrypt unlock-all"
 } > "$GENERATOR_DIR"/kcrypt.service
 
 
