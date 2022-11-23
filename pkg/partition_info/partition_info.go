@@ -127,6 +127,8 @@ func createInfoFileIfNotExists(fileName string) (bool, error) {
 			return false, err
 		}
 		return false, nil
+	} else if err != nil {
+		return false, err
 	}
 	return true, nil
 }
