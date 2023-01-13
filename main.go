@@ -14,11 +14,10 @@ import (
 	"github.com/jaypipes/ghw"
 	"github.com/jaypipes/ghw/pkg/block"
 	"github.com/kairos-io/kcrypt/pkg/bus"
+	configpkg "github.com/kairos-io/kcrypt/pkg/config"
 	"github.com/mudler/go-pluggable"
 	cp "github.com/otiai10/copy"
 	"github.com/urfave/cli"
-
-	pi "github.com/kairos-io/kcrypt/pkg/partition_info"
 )
 
 var Version = "v0.0.0-dev"
@@ -156,7 +155,7 @@ func luksify(label string) (string, error) {
 		return "", fmt.Errorf("err: %w, out: %s", err, out2)
 	}
 
-	return pi.PartitionToString(b), nil
+	return configpkg.PartitionToString(b), nil
 }
 
 func findPartition(label string) (string, *block.Partition, error) {
@@ -281,9 +280,9 @@ func injectInitrd(initrd string, file, dst string) error {
 func unlockAll() error {
 	bus.Manager.Initialize()
 
-	partitionInfo, _, err := pi.NewPartitionInfoFromFile(pi.DefaultPartitionInfoFile)
+	config, err := configpkg.GetConfiguration(configpkg.ConfigScanDirs)
 	if err != nil {
-		fmt.Printf("Warning: Partition file not found '%s' \n", pi.DefaultPartitionInfoFile)
+		fmt.Printf("Warning: Could not read kcrypt configuration '%s'\n", err.Error())
 	}
 
 	block, err := ghw.Block()
@@ -296,9 +295,7 @@ func unlockAll() error {
 	for _, disk := range block.Disks {
 		for _, p := range disk.Partitions {
 			if p.Type == "crypto_LUKS" {
-				if partitionInfo != nil {
-					p.Label = partitionInfo.LookupLabelForUUID(p.UUID)
-				}
+				p.Label = config.LookupLabelForUUID(p.UUID)
 				fmt.Printf("Unmounted Luks found at '%s' LABEL '%s' \n", p.Name, p.Label)
 				err = multierror.Append(err, unlockDisk(p))
 				if err != nil {
