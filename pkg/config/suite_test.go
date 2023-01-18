@@ -1,4 +1,4 @@
-package partition_info
+package config
 
 import (
 	"testing"
@@ -9,5 +9,5 @@ import (
 
 func TestPartitionINfo(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "PartitionInfo file parser test suite")
+	RunSpecs(t, "Kcrypt config test suite")
 }
