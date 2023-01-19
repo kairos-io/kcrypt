@@ -25,7 +25,6 @@ var MappingsFile = "/oem/91-kcrypt-mappings.yaml"
 
 type Config struct {
 	Kcrypt struct {
-		Server            string            `yaml:"challenger_server,omitempty"`
 		UUIDLabelMappings map[string]string `yaml:"uuid_label_mappings,omitempty"`
 	}
 }
