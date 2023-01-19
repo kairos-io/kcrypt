@@ -27,7 +27,6 @@ var _ = Describe("Config", func() {
 			It("returns empty Config", func() {
 				c, err := configpkg.GetConfiguration([]string{tmpDir})
 				Expect(err).ToNot(HaveOccurred())
-				Expect(c.Kcrypt.Server).To(BeEmpty())
 				Expect(c.Kcrypt.UUIDLabelMappings).To(BeEmpty())
 			})
 		})
@@ -40,8 +39,6 @@ var _ = Describe("Config", func() {
 				Expect(err).ToNot(HaveOccurred())
 				data := []byte(`#cloud-config
 kcrypt:
-  challenger_server: http://test.org:8082
-
   uuid_label_mappings:
     COS_PERSISTENT: some_uuid_here
 `)
@@ -52,7 +49,6 @@ kcrypt:
 			It("returns the Config", func() {
 				c, err := configpkg.GetConfiguration([]string{tmpDir})
 				Expect(err).ToNot(HaveOccurred())
-				Expect(c.Kcrypt.Server).To(Equal("http://test.org:8082"))
 				Expect(c.Kcrypt.UUIDLabelMappings["COS_PERSISTENT"]).To(Equal("some_uuid_here"))
 			})
 		})
@@ -84,7 +80,6 @@ kcrypt:
 			It("returns the merged Config", func() {
 				c, err := configpkg.GetConfiguration([]string{tmpDir})
 				Expect(err).ToNot(HaveOccurred())
-				Expect(c.Kcrypt.Server).To(Equal("http://test.org:8082"))
 				Expect(c.Kcrypt.UUIDLabelMappings["COS_PERSISTENT"]).To(Equal("some_uuid_here"))
 			})
 		})
