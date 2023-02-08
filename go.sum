@@ -238,6 +238,8 @@ github.com/moby/libnetwork v0.8.0-dev.2.0.20200612180813-9e99af28df21/go.mod h1:
 github.com/mudler/entities v0.0.0-20211108084227-d1414478861b/go.mod h1:qquFT9tYp+/NO7tTotto4BT9zSRYSMDxo2PGZwujpFA=
 github.com/mudler/go-pluggable v0.0.0-20220716112424-189d463e3ff3 h1:t4X6t8WisUy5mExfS58RBOkzaEGmuor5kOUMQS8lT2g=
 github.com/mudler/go-pluggable v0.0.0-20220716112424-189d463e3ff3/go.mod h1:WmKcT8ONmhDQIqQ+HxU+tkGWjzBEyY/KFO8LTGCu4AI=
+github.com/mudler/go-pluggable v0.0.0-20230126220627-7710299a0ae5 h1:FaZD86+A9mVt7lh9glAryzQblMsbJYU2VnrdZ8yHlTs=
+github.com/mudler/go-pluggable v0.0.0-20230126220627-7710299a0ae5/go.mod h1:WmKcT8ONmhDQIqQ+HxU+tkGWjzBEyY/KFO8LTGCu4AI=
 github.com/mudler/yip v0.11.4 h1:xTeSOtK2JUCCbtpkdQsZsJyIbTRwxWWBj1B/Np7bI/4=
 github.com/mudler/yip v0.11.4/go.mod h1:hdQfJzbhjSclVGhTzWKhCLdonoFUM0fZGwibNE5Rtr8=
 github.com/mwitkow/go-conntrack v0.0.0-20161129095857-cc309e4a2223/go.mod h1:qRWi+5nqEBWmkhHvq77mSJWrCKwh8bxhgT7d/eI7P4U=
