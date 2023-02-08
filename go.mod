@@ -7,7 +7,7 @@ require (
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/jaypipes/ghw v0.9.0
 	github.com/kairos-io/kairos v1.24.3-56.0.20230118103822-e3dbd41dddd1
-	github.com/mudler/go-pluggable v0.0.0-20220716112424-189d463e3ff3
+	github.com/mudler/go-pluggable v0.0.0-20230126220627-7710299a0ae5
 	github.com/onsi/ginkgo/v2 v2.7.0
 	github.com/onsi/gomega v1.25.0
 	github.com/otiai10/copy v1.9.0
