@@ -14,7 +14,7 @@ oem_label=$(getarg rd.cos.oemlabel=)
 if getargbool 0 rd.cos.disable; then
     exit 0
 fi
-// Netboot is set on...well, netboot obiously
+## Netboot is set on...well, netboot obiously
 if getargbool 0 netboot; then
     exit 0
 fi
