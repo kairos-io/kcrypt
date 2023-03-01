@@ -9,8 +9,8 @@ GENERATOR_DIR="$2"
 
 oem_label=$(getarg rd.cos.oemlabel=)
 
-// Several things indicate booting from a different media so we should not do anything
-// rd.cos.disable is set on LIVECD and disables mounting of any type
+## Several things indicate booting from a different media so we should not do anything
+## rd.cos.disable is set on LIVECD and disables mounting of any type
 if getargbool 0 rd.cos.disable; then
     exit 0
 fi
