@@ -13,7 +13,7 @@ oem_label=$(getarg rd.cos.oemlabel=)
 {
     echo "[Unit]"
     echo "DefaultDependencies=no"
-    echo "Before=cos-immutable-rootfs.service"
+    echo "Before=immucore.service"
     echo "Conflicts=initrd-switch-root.target"
     if getargbool 0 rd.neednet; then
         echo "Wants=network-online.target"
