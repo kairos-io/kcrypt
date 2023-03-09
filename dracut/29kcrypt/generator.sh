@@ -9,6 +9,17 @@ GENERATOR_DIR="$2"
 
 oem_label=$(getarg rd.cos.oemlabel=)
 
+## Several things indicate booting from a different media so we should not do anything
+## rd.cos.disable is set on LIVECD and disables mounting of any type
+if getargbool 0 rd.cos.disable; then
+    exit 0
+fi
+## Netboot is set on...well, netboot obiously
+if getargbool 0 netboot; then
+    exit 0
+fi
+
+
 # See https://github.com/kairos-io/packages/blob/d12b12b043a71d8471454f7b4fc84c3181d2bf60/packages/system/dracut/immutable-rootfs/30cos-immutable-rootfs/cos-generator.sh#L29
 {
     echo "[Unit]"
