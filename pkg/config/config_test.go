@@ -68,7 +68,7 @@ kcrypt:
 
 				tmpFile2, err = os.CreateTemp(tmpDir, "config-*.yaml")
 				Expect(err).ToNot(HaveOccurred())
-				data = []byte(`
+				data = []byte(`#cloud-config
 kcrypt:
   uuid_label_mappings:
     COS_PERSISTENT: some_uuid_here

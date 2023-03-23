@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/jaypipes/ghw/pkg/block"
-	"github.com/kairos-io/kairos/pkg/config"
+	"github.com/kairos-io/kairos/pkg/config/collector"
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v1"
 )
@@ -47,12 +47,21 @@ func partitionDataFromString(partitionStr string) (string, string, error) {
 func GetConfiguration(configDirs []string) (Config, error) {
 	var result Config
 
-	c, err := config.Scan(config.Directories(configDirs...), config.NoLogs)
-	if err != nil {
+	o := &collector.Options{}
+
+	if err := o.Apply(collector.Directories(configDirs...), collector.NoLogs); err != nil {
 		return result, err
 	}
 
-	if err = c.Unmarshal(&result); err != nil {
+	c, err := collector.Scan(o)
+	if err != nil {
+		return result, err
+	}
+	configStr, err := c.String()
+	if err != nil {
+		return result, err
+	}
+	if err = yaml.Unmarshal([]byte(configStr), &result); err != nil {
 		return result, err
 	}
 
@@ -85,6 +94,8 @@ func (c *Config) WriteMappings(fileName string) error {
 	if err != nil {
 		return errors.Wrap(err, "marshalling the kcrypt configuration to yaml")
 	}
+
+	data = append([]byte(collector.DefaultHeader+"\n"), data...)
 
 	err = ioutil.WriteFile(fileName, data, 0744)
 	if err != nil {
