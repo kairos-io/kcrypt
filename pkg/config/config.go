@@ -4,7 +4,7 @@ package config
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 	"strings"
 
 	"github.com/jaypipes/ghw/pkg/block"
@@ -97,7 +97,7 @@ func (c *Config) WriteMappings(fileName string) error {
 
 	data = append([]byte(collector.DefaultHeader+"\n"), data...)
 
-	err = ioutil.WriteFile(fileName, data, 0744)
+	err = os.WriteFile(fileName, data, 0744)
 	if err != nil {
 		return errors.Wrap(err, "writing the kcrypt configuration file")
 	}

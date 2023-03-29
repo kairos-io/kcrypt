@@ -124,8 +124,11 @@ kcrypt:
 			})
 
 			It("replaces the file contents", func() {
-				c.SetMapping("COS_PERSISTENT:the_new_name:the_new_uuid")
-				c.WriteMappings(tmpFile.Name())
+<<<<<<< HEAD
+				err := c.SetMapping("COS_PERSISTENT:the_new_name:the_new_uuid")
+				Expect(err).ToNot(HaveOccurred())
+				err = c.WriteMappings(tmpFile.Name())
+				Expect(err).ToNot(HaveOccurred())
 				data, err := os.ReadFile(tmpFile.Name())
 				Expect(err).ToNot(HaveOccurred())
 				Expect(collector.HasValidHeader(string(data))).To(BeTrue())
@@ -145,8 +148,9 @@ kcrypt:
 			})
 
 			It("creates the file with the given mappings", func() {
-				c.SetMapping("COS_PERSISTENT:the_new_name:the_new_uuid")
-				err := c.WriteMappings(tmpFile.Name())
+				err := c.SetMapping("COS_PERSISTENT:the_new_name:the_new_uuid")
+				Expect(err).ToNot(HaveOccurred())
+				err = c.WriteMappings(tmpFile.Name())
 				Expect(err).ToNot(HaveOccurred())
 
 				newConfig, err := configpkg.GetConfiguration([]string{tmpDir})
@@ -164,8 +168,10 @@ kcrypt:
 			tmpFile, err = os.CreateTemp(tmpDir, "config-*.yaml")
 			Expect(err).ToNot(HaveOccurred())
 			// Should trim the whitespace
-			c.SetMapping("COS_PERSISTENT:the_new_name:some_uuid_1\n")
-			c.WriteMappings(tmpFile.Name())
+			err = c.SetMapping("COS_PERSISTENT:the_new_name:some_uuid_1\n")
+			Expect(err).ToNot(HaveOccurred())
+			err = c.WriteMappings(tmpFile.Name())
+			Expect(err).ToNot(HaveOccurred())
 		})
 
 		It("returns the correct UUID", func() {
@@ -192,8 +198,10 @@ kcrypt:
 		BeforeEach(func() {
 			tmpFile, err = os.CreateTemp(tmpDir, "config-*.yaml")
 			Expect(err).ToNot(HaveOccurred())
-			c.SetMapping("COS_PERSISTENT:the_new_name:some_uuid_1")
-			c.WriteMappings(tmpFile.Name())
+			err = c.SetMapping("COS_PERSISTENT:the_new_name:some_uuid_1")
+			Expect(err).ToNot(HaveOccurred())
+			err = c.WriteMappings(tmpFile.Name())
+			Expect(err).ToNot(HaveOccurred())
 		})
 
 		It("returns the correct label", func() {

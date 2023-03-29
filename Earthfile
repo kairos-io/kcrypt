@@ -3,6 +3,9 @@ VERSION 0.6
 # TODO: This needs to come from pre-built kernels in c3os repos, kcrypt included.
 # Framework images should use our initrd
 ARG BASE_IMAGE=quay.io/kairos/core-opensuse
+# renovate: datasource=docker depName=golang
+ARG GO_VERSION=1.20.2
+ARG GOLINT_VERSION=1.52.2
 
 build-kcrypt:
     FROM golang:alpine
@@ -63,6 +66,15 @@ iso:
     RUN sha256sum $ISO_NAME.iso > $ISO_NAME.iso.sha256
     SAVE ARTIFACT /build/$ISO_NAME.iso iso AS LOCAL build/$ISO_NAME.iso
     SAVE ARTIFACT /build/$ISO_NAME.iso.sha256 sha256 AS LOCAL build/$ISO_NAME.iso.sha256
+
+golint:
+    ARG GO_VERSION
+    FROM golang:$GO_VERSION
+    ARG GOLINT_VERSION
+    RUN wget -O- -nv https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s v$GOLINT_VERSION
+    WORKDIR /build
+    COPY . .
+    RUN golangci-lint run
 
 yamllint:
     FROM cytopia/yamllint
