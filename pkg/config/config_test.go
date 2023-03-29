@@ -6,6 +6,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
+	"github.com/kairos-io/kairos/pkg/config/collector"
 	configpkg "github.com/kairos-io/kcrypt/pkg/config"
 )
 
@@ -68,7 +69,7 @@ kcrypt:
 
 				tmpFile2, err = os.CreateTemp(tmpDir, "config-*.yaml")
 				Expect(err).ToNot(HaveOccurred())
-				data = []byte(`
+				data = []byte(`#cloud-config
 kcrypt:
   uuid_label_mappings:
     COS_PERSISTENT: some_uuid_here
@@ -125,6 +126,9 @@ kcrypt:
 			It("replaces the file contents", func() {
 				c.SetMapping("COS_PERSISTENT:the_new_name:the_new_uuid")
 				c.WriteMappings(tmpFile.Name())
+				data, err := os.ReadFile(tmpFile.Name())
+				Expect(err).ToNot(HaveOccurred())
+				Expect(collector.HasValidHeader(string(data))).To(BeTrue())
 
 				newConfig, err := configpkg.GetConfiguration([]string{tmpDir})
 				Expect(err).ToNot(HaveOccurred())
