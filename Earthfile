@@ -67,6 +67,10 @@ iso:
     SAVE ARTIFACT /build/$ISO_NAME.iso iso AS LOCAL build/$ISO_NAME.iso
     SAVE ARTIFACT /build/$ISO_NAME.iso.sha256 sha256 AS LOCAL build/$ISO_NAME.iso.sha256
 
+lint:
+    BUILD +golint
+    BUILD +yamllint
+
 golint:
     ARG GO_VERSION
     FROM golang:$GO_VERSION

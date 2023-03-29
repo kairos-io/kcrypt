@@ -1,0 +1,28 @@
+name: Lint
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    paths:
+      - '**'
+env:
+  FORCE_COLOR: 1
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Install Go
+        uses: actions/setup-go@v4
+      - name: Install earthly
+        uses: Luet-lab/luet-install-action@v1
+        with:
+          repository: quay.io/kairos/packages
+          packages: utils/earthly
+      - name: Run Lint checks
+        run: |
+          earthly +lint
