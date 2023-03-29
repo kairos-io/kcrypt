@@ -1,6 +1,6 @@
 module github.com/kairos-io/kcrypt
 
-go 1.18
+go 1.20
 
 require (
 	github.com/anatol/luks.go v0.0.0-20230125211543-ada2562d4206
