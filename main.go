@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -24,8 +23,11 @@ var Version = "v0.0.0-dev"
 
 func waitdevice(device string, attempts int) error {
 	for tries := 0; tries < attempts; tries++ {
-		sh("udevadm settle")
-		_, err := os.Lstat(device)
+		_, err := sh("udevadm settle")
+		if err != nil {
+			return err
+		}
+		_, err = os.Lstat(device)
 		if !os.IsNotExist(err) {
 			return nil
 		}
@@ -44,7 +46,10 @@ func getPassword(b *block.Partition) (password string, err error) {
 			err = fmt.Errorf("failed discovery: %s", r.Error)
 		}
 	})
-	bus.Manager.Publish(bus.EventDiscoveryPassword, b)
+	_, err = bus.Manager.Publish(bus.EventDiscoveryPassword, b)
+	if err != nil {
+		return password, err
+	}
 
 	if password == "" {
 		return password, fmt.Errorf("received empty password")
@@ -93,19 +98,6 @@ func createLuks(dev, password, version string, cryptsetupArgs ...string) error {
 	}
 
 	return nil
-}
-
-func createDiskImage() (*os.File, error) {
-	disk, err := ioutil.TempFile("", "luksv2.go.disk")
-	if err != nil {
-		return nil, err
-	}
-
-	if err := disk.Truncate(24 * 1024 * 1024); err != nil {
-		return nil, err
-	}
-
-	return disk, err
 }
 
 // TODO: A crypt disk utility to call after install, that with discovery discoveries the password that should be used
@@ -210,9 +202,13 @@ func detect(archive string) (string, error) {
 
 // TODO: replace with golang native code
 func extractInitrd(initrd string, dst string) error {
-	os.MkdirAll(dst, os.ModePerm)
 	var out string
 	var err error
+	err = os.MkdirAll(dst, os.ModePerm)
+	if err != nil {
+		return err
+	}
+
 	format, err := detect(initrd)
 	if err != nil {
 		return err
@@ -256,7 +252,7 @@ func injectInitrd(initrd string, file, dst string) error {
 	if err != nil {
 		return err
 	}
-	tmp, err := ioutil.TempDir("", "kcrypt")
+	tmp, err := os.MkdirTemp("", "kcrypt")
 	if err != nil {
 		return fmt.Errorf("cannot create tempdir, %s", err)
 	}
@@ -297,8 +293,8 @@ func unlockAll() error {
 			if p.Type == "crypto_LUKS" {
 				p.Label = config.LookupLabelForUUID(p.UUID)
 				fmt.Printf("Unmounted Luks found at '%s' LABEL '%s' \n", p.Name, p.Label)
-				err = multierror.Append(err, unlockDisk(p))
-				if err != nil {
+				multiError := multierror.Append(err, unlockDisk(p))
+				if multiError.ErrorOrNil() != nil {
 					fmt.Printf("Unlocking failed: '%s'\n", err.Error())
 				}
 				time.Sleep(10 * time.Second)
