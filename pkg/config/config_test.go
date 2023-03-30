@@ -124,7 +124,6 @@ kcrypt:
 			})
 
 			It("replaces the file contents", func() {
-<<<<<<< HEAD
 				err := c.SetMapping("COS_PERSISTENT:the_new_name:the_new_uuid")
 				Expect(err).ToNot(HaveOccurred())
 				err = c.WriteMappings(tmpFile.Name())
