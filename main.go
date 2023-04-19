@@ -8,13 +8,10 @@ import (
 	"strings"
 	"time"
 
-	luks "github.com/anatol/luks.go"
-	multierror "github.com/hashicorp/go-multierror"
 	"github.com/jaypipes/ghw"
 	"github.com/jaypipes/ghw/pkg/block"
-	"github.com/kairos-io/kcrypt/pkg/bus"
 	configpkg "github.com/kairos-io/kcrypt/pkg/config"
-	"github.com/mudler/go-pluggable"
+	"github.com/kairos-io/kcrypt/pkg/lib"
 	cp "github.com/otiai10/copy"
 	"github.com/urfave/cli"
 )
@@ -34,52 +31,6 @@ func waitdevice(device string, attempts int) error {
 		time.Sleep(1 * time.Second)
 	}
 	return fmt.Errorf("no device found")
-}
-
-// TODO: Ask to discovery a pass to unlock. keep waiting until we get it and a timeout is exhausted with retrials (exp backoff)
-func getPassword(b *block.Partition) (password string, err error) {
-	bus.Reload()
-
-	bus.Manager.Response(bus.EventDiscoveryPassword, func(p *pluggable.Plugin, r *pluggable.EventResponse) {
-		password = r.Data
-		if r.Errored() {
-			err = fmt.Errorf("failed discovery: %s", r.Error)
-		}
-	})
-	_, err = bus.Manager.Publish(bus.EventDiscoveryPassword, b)
-	if err != nil {
-		return password, err
-	}
-
-	if password == "" {
-		return password, fmt.Errorf("received empty password")
-	}
-
-	return
-}
-
-func luksUnlock(device, mapper, password string) error {
-	dev, err := luks.Open(device)
-	if err != nil {
-		// handle error
-		return err
-	}
-	defer dev.Close()
-
-	err = dev.Unlock(0, []byte(password), mapper)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func unlockDisk(b *block.Partition) error {
-	pass, err := getPassword(b)
-	if err != nil {
-		return fmt.Errorf("error retreiving password remotely: %w", err)
-	}
-
-	return luksUnlock(fmt.Sprintf("/dev/%s", b.Name), b.Name, pass)
 }
 
 func createLuks(dev, password, version string, cryptsetupArgs ...string) error {
@@ -116,7 +67,7 @@ func luksify(label string) (string, error) {
 		return "", err
 	}
 
-	pass, err := getPassword(b)
+	pass, err := lib.GetPassword(b)
 	if err != nil {
 		return "", err
 	}
@@ -128,7 +79,7 @@ func luksify(label string) (string, error) {
 		return "", err
 	}
 
-	if err := luksUnlock(persistent, b.Name, pass); err != nil {
+	if err := lib.LuksUnlock(persistent, b.Name, pass); err != nil {
 		return "", err
 	}
 
@@ -273,36 +224,6 @@ func injectInitrd(initrd string, file, dst string) error {
 }
 
 // TODO: a custom toolkit version, to build out initrd pre-built with this component
-func unlockAll() error {
-	bus.Manager.Initialize()
-
-	config, err := configpkg.GetConfiguration(configpkg.ConfigScanDirs)
-	if err != nil {
-		fmt.Printf("Warning: Could not read kcrypt configuration '%s'\n", err.Error())
-	}
-
-	block, err := ghw.Block()
-	if err != nil {
-		fmt.Printf("Warning: Error reading partitions '%s \n", err.Error())
-
-		return nil
-	}
-
-	for _, disk := range block.Disks {
-		for _, p := range disk.Partitions {
-			if p.Type == "crypto_LUKS" {
-				p.Label = config.LookupLabelForUUID(p.UUID)
-				fmt.Printf("Unmounted Luks found at '%s' LABEL '%s' \n", p.Name, p.Label)
-				multiError := multierror.Append(err, unlockDisk(p))
-				if multiError.ErrorOrNil() != nil {
-					fmt.Printf("Unlocking failed: '%s'\n", err.Error())
-				}
-				time.Sleep(10 * time.Second)
-			}
-		}
-	}
-	return nil
-}
 
 func main() {
 	app := &cli.App{
@@ -363,7 +284,7 @@ Typically run during initrd to unlock all the LUKS partitions found
 					&cli.StringFlag{},
 				},
 				Action: func(c *cli.Context) error {
-					return unlockAll()
+					return lib.UnlockAll()
 				},
 			},
 		},
