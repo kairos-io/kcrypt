@@ -16,13 +16,20 @@ build-kcrypt:
     RUN CGO_ENABLED=0 go build -o kcrypt -ldflags "-X main.Version=$VERSION"
     SAVE ARTIFACT /work/kcrypt AS LOCAL kcrypt
 
+dracut-artifacts:
+    FROM $BASE_IMAGE
+    WORKDIR /build
+    COPY --dir dracut/29kcrypt .
+    COPY dracut/10-kcrypt.conf .
+    SAVE ARTIFACT 29kcrypt 29kcrypt
+    SAVE ARTIFACT 10-kcrypt.conf 10-kcrypt.conf
+
 build-dracut:
     FROM $BASE_IMAGE
-    COPY . /work
-    COPY +build-kcrypt/kcrypt /usr/bin/kcrypt
     WORKDIR /work
-    RUN cp -r dracut/* /usr/lib/dracut/modules.d
-    RUN cp dracut.conf /etc/dracut.conf.d/10-kcrypt.conf
+    COPY +build-kcrypt/kcrypt /usr/bin/kcrypt
+    COPY +dracut-artifacts/29kcrypt /usr/lib/dracut/modules.d/29kcrypt
+    COPY +dracut-artifacts/10-kcrypt.conf /etc/dracut.conf.d/10-kcrypt.conf
     RUN kernel=$(ls /lib/modules | head -n1) && \
         dracut -f "/boot/initrd-${kernel}" "${kernel}" && \
         ln -sf "initrd-${kernel}" /boot/initrd
