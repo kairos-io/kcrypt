@@ -14,7 +14,7 @@ build-kcrypt:
     WORKDIR /work
     ARG VERSION="$(git describe --tags)"
     RUN CGO_ENABLED=0 go build -o kcrypt -ldflags "-X main.Version=$VERSION"
-    SAVE ARTIFACT /work/kcrypt AS LOCAL kcrypt
+    SAVE ARTIFACT /work/kcrypt kcrypt AS LOCAL kcrypt
 
 dracut-artifacts:
     FROM $BASE_IMAGE
