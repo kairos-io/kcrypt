@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/gofrs/uuid"
 	"github.com/jaypipes/ghw"
 	"github.com/jaypipes/ghw/pkg/block"
 	configpkg "github.com/kairos-io/kcrypt/pkg/config"
@@ -43,8 +44,8 @@ func createLuks(dev, password, version string, cryptsetupArgs ...string) error {
 	cmd.Stdin = strings.NewReader(password)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-
-	if err := cmd.Run(); err != nil {
+	err := cmd.Run()
+	if err != nil {
 		return err
 	}
 
@@ -74,8 +75,9 @@ func luksify(label string) (string, error) {
 
 	persistent = fmt.Sprintf("/dev/%s", persistent)
 	devMapper := fmt.Sprintf("/dev/mapper/%s", b.Name)
+	partUUID := uuid.NewV5(uuid.NamespaceURL, label)
 
-	if err := createLuks(persistent, pass, "luks1"); err != nil {
+	if err := createLuks(persistent, pass, "luks1", []string{"--uuid", partUUID.String()}...); err != nil {
 		return "", err
 	}
 
@@ -87,8 +89,8 @@ func luksify(label string) (string, error) {
 		return "", err
 	}
 
-	out, err := sh(fmt.Sprintf("mkfs.ext4 -L %s %s", label, devMapper))
-
+	cmd := fmt.Sprintf("mkfs.ext4 -L %s %s", label, devMapper)
+	out, err := sh(cmd)
 	if err != nil {
 		return "", fmt.Errorf("err: %w, out: %s", err, out)
 	}
@@ -102,11 +104,11 @@ func luksify(label string) (string, error) {
 }
 
 func findPartition(label string) (string, *block.Partition, error) {
-	block, err := ghw.Block()
+	b, err := ghw.Block()
 	if err == nil {
-		for _, disk := range block.Disks {
+		for _, disk := range b.Disks {
 			for _, p := range disk.Partitions {
-				if p.Label == label {
+				if p.FilesystemLabel == label {
 					return p.Name, p, nil
 				}
 

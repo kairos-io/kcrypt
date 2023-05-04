@@ -2,12 +2,13 @@ package lib
 
 import (
 	"fmt"
-	"time"
+	"path/filepath"
+	"strings"
 
 	"github.com/anatol/luks.go"
-	"github.com/hashicorp/go-multierror"
 	"github.com/jaypipes/ghw"
 	"github.com/jaypipes/ghw/pkg/block"
+	"github.com/kairos-io/kairos-sdk/utils"
 	"github.com/kairos-io/kcrypt/pkg/bus"
 	configpkg "github.com/kairos-io/kcrypt/pkg/config"
 	"github.com/mudler/go-pluggable"
@@ -32,13 +33,32 @@ func UnlockAll() error {
 	for _, disk := range blk.Disks {
 		for _, p := range disk.Partitions {
 			if p.Type == "crypto_LUKS" {
-				p.Label = config.LookupLabelForUUID(p.UUID)
-				fmt.Printf("Unmounted Luks found at '%s' LABEL '%s' \n", p.Name, p.Label)
-				multiError := multierror.Append(err, UnlockDisk(p))
-				if multiError.ErrorOrNil() != nil {
-					fmt.Printf("Unlocking failed: '%s'\n", err.Error())
+				// Get the luks UUID directly from cryptsetup
+				volumeUUID, err := utils.SH(fmt.Sprintf("cryptsetup luksUUID %s", filepath.Join("/dev", p.Name)))
+				if err != nil {
+					return err
 				}
-				time.Sleep(10 * time.Second)
+				volumeUUID = strings.TrimSpace(volumeUUID)
+				if volumeUUID == "" {
+					fmt.Printf("No uuid for %s, skipping\n", p.Name)
+					continue
+				}
+				p.Label, err = config.GetLabelForUUID(volumeUUID)
+				if err != nil {
+					return err
+				}
+				// Check if device is already mounted
+				// We mount it under /dev/mapper/DEVICE, so It's pretty easy to check
+				if !utils.Exists(filepath.Join("/dev", "mapper", p.Name)) {
+					fmt.Printf("Unmounted Luks found at '%s' LABEL '%s' \n", filepath.Join("/dev", p.Name), p.Label)
+					err = UnlockDisk(p)
+					if err != nil {
+						fmt.Printf("Unlocking failed: '%s'\n", err.Error())
+					}
+				} else {
+					fmt.Printf("Device %s seems to be mounted at %s, skipping\n", filepath.Join("/dev", p.Name), filepath.Join("/dev", "mapper", p.Name))
+				}
+
 			}
 		}
 	}
@@ -52,7 +72,7 @@ func UnlockDisk(b *block.Partition) error {
 		return fmt.Errorf("error retreiving password remotely: %w", err)
 	}
 
-	return LuksUnlock(fmt.Sprintf("/dev/%s", b.Name), b.Name, pass)
+	return LuksUnlock(filepath.Join("/dev", b.Name), b.Name, pass)
 }
 
 // GetPassword gets the password for a block.Partition
