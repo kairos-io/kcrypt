@@ -35,6 +35,7 @@ func UnlockAll() error {
 			if p.Type == "crypto_LUKS" {
 				// Get the luks UUID directly from cryptsetup
 				volumeUUID, err := utils.SH(fmt.Sprintf("cryptsetup luksUUID %s", filepath.Join("/dev", p.Name)))
+				fmt.Printf("Got luks UUID %s for partition %s\n", volumeUUID, p.Name)
 				if err != nil {
 					return err
 				}
@@ -43,14 +44,14 @@ func UnlockAll() error {
 					fmt.Printf("No uuid for %s, skipping\n", p.Name)
 					continue
 				}
-				p.Label, err = config.GetLabelForUUID(volumeUUID)
+				p.FilesystemLabel, err = config.GetLabelForUUID(volumeUUID)
 				if err != nil {
 					return err
 				}
 				// Check if device is already mounted
 				// We mount it under /dev/mapper/DEVICE, so It's pretty easy to check
 				if !utils.Exists(filepath.Join("/dev", "mapper", p.Name)) {
-					fmt.Printf("Unmounted Luks found at '%s' LABEL '%s' \n", filepath.Join("/dev", p.Name), p.Label)
+					fmt.Printf("Unmounted Luks found at '%s' LABEL '%s' \n", filepath.Join("/dev", p.Name), p.FilesystemLabel)
 					err = UnlockDisk(p)
 					if err != nil {
 						fmt.Printf("Unlocking failed: '%s'\n", err.Error())
