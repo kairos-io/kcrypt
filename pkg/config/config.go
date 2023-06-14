@@ -9,7 +9,7 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/jaypipes/ghw/pkg/block"
-	"github.com/kairos-io/kairos/pkg/config/collector"
+	"github.com/kairos-io/kairos-sdk/collector"
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v1"
 )
@@ -48,13 +48,15 @@ func partitionDataFromString(partitionStr string) (string, string, error) {
 func GetConfiguration(configDirs []string) (Config, error) {
 	var result Config
 
-	o := &collector.Options{}
+	o := &collector.Options{MergeBootCMDLine: false}
 
 	if err := o.Apply(collector.Directories(configDirs...), collector.NoLogs); err != nil {
 		return result, err
 	}
 
-	c, err := collector.Scan(o)
+	c, err := collector.Scan(o, func(d []byte) ([]byte, error) {
+		return d, nil
+	})
 	if err != nil {
 		return result, err
 	}

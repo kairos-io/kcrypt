@@ -6,7 +6,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/kairos-io/kairos/pkg/config/collector"
+	"github.com/kairos-io/kairos-sdk/collector"
 	configpkg "github.com/kairos-io/kcrypt/pkg/config"
 )
 
