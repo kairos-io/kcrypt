@@ -2,7 +2,6 @@ package lib
 
 import (
 	"fmt"
-	"github.com/anatol/luks.go"
 	"github.com/gofrs/uuid"
 	"github.com/jaypipes/ghw"
 	"github.com/jaypipes/ghw/pkg/block"
@@ -75,7 +74,7 @@ func Luksify(label, version string, tpm bool) (string, error) {
 		// Enroll PCR values as an unlock method
 		args := []string{"--tpm2-device=auto", "--tpm2-pcrs=7+8+9", part}
 		cmd := exec.Command("systemd-cryptenroll", args...)
-		cmd.Stdin = strings.NewReader(pass)
+		cmd.Env = append(cmd.Env, fmt.Sprintf("PASSWORD=%s", pass)) // cannot pass it via stdin
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
 		err := cmd.Run()
@@ -85,22 +84,22 @@ func Luksify(label, version string, tpm bool) (string, error) {
 	}
 
 	if err := LuksUnlock(part, b.Name, pass); err != nil {
-		return "", err
+		return "", fmt.Errorf("unlock err: %w", err)
 	}
 
 	if err := Waitdevice(devMapper, 10); err != nil {
-		return "", err
+		return "", fmt.Errorf("waitdevice err: %w", err)
 	}
 
 	cmd := fmt.Sprintf("mkfs.ext4 -L %s %s", label, devMapper)
 	out, err := SH(cmd)
 	if err != nil {
-		return "", fmt.Errorf("err: %w, out: %s", err, out)
+		return "", fmt.Errorf("mkfs err: %w, out: %s", err, out)
 	}
 
-	err = luks.Lock(b.Name)
+	out, err = SH(fmt.Sprintf("cryptsetup close %s", b.Name))
 	if err != nil {
-		return "", fmt.Errorf("err: %w", err)
+		return "", fmt.Errorf("lock err: %w, out: %s", err, out)
 	}
 
 	if tpm {
