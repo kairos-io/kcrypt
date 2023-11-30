@@ -24,11 +24,24 @@ func main() {
 
 				Name:        "encrypt",
 				Description: "Encrypts a partition",
+				Usage:       "Encrypts a partition",
+				ArgsUsage:   "kcrypt [--version VERSION] [--tpm] LABEL",
+				Flags: []cli.Flag{
+					&cli.StringFlag{
+						Name:  "version",
+						Value: "luks1",
+						Usage: "luks version to use",
+					},
+					&cli.BoolFlag{
+						Name:  "tpm",
+						Usage: "Use TPM to lock the partition",
+					},
+				},
 				Action: func(c *cli.Context) error {
 					if c.NArg() != 1 {
 						return fmt.Errorf("requires 1 arg, the partition label")
 					}
-					out, err := lib.Luksify(c.Args().First())
+					out, err := lib.Luksify(c.Args().First(), c.String("version"), c.Bool("tpm"))
 					if err != nil {
 						return err
 					}
@@ -38,24 +51,19 @@ func main() {
 			},
 
 			{
-				Name:      "unlock-all",
-				UsageText: "unlock-all",
-				Usage:     "Try to unlock all LUKS partitions",
-				Description: `
-Typically run during initrd to unlock all the LUKS partitions found
-		`,
-				ArgsUsage: "kcrypt unlock-all",
-				Flags: []cli.Flag{
-
-					&cli.StringFlag{},
-				},
+				Name:        "unlock-all",
+				UsageText:   "unlock-all",
+				Usage:       "Try to unlock all LUKS partitions",
+				Description: "Typically run during initrd to unlock all the LUKS partitions found",
+				ArgsUsage:   "kcrypt unlock-all",
 				Action: func(c *cli.Context) error {
 					return lib.UnlockAll()
 				},
 			},
 			{
 
-				Name: "extract-initrd",
+				Name:   "extract-initrd",
+				Hidden: true,
 				Action: func(c *cli.Context) error {
 					if c.NArg() != 2 {
 						return fmt.Errorf("requires 3 args. initrd,, dst")
@@ -64,8 +72,8 @@ Typically run during initrd to unlock all the LUKS partitions found
 				},
 			},
 			{
-
-				Name: "inject-initrd",
+				Name:   "inject-initrd",
+				Hidden: true,
 				Action: func(c *cli.Context) error {
 					if c.NArg() != 3 {
 						return fmt.Errorf("requires 3 args. initrd, srcfile, dst")

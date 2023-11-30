@@ -2,10 +2,12 @@ package lib
 
 import (
 	"fmt"
+	"github.com/anatol/luks.go"
 	"github.com/gofrs/uuid"
 	"github.com/jaypipes/ghw"
 	"github.com/jaypipes/ghw/pkg/block"
 	configpkg "github.com/kairos-io/kcrypt/pkg/config"
+	"k8s.io/apimachinery/pkg/util/rand"
 	"os"
 	"os/exec"
 	"strings"
@@ -29,33 +31,55 @@ func CreateLuks(dev, password, version string, cryptsetupArgs ...string) error {
 	return nil
 }
 
-// Take a part label, and recreates it with LUKS. IT OVERWRITES DATA!
+// Luksify Take a part label, and recreates it with LUKS. IT OVERWRITES DATA!
 // On success, it returns a machine parseable string with the partition information
 // (label:name:uuid) so that it can be stored by the caller for later use.
 // This is because the label of the encrypted partition is not accessible unless
 // the partition is decrypted first and the uuid changed after encryption so
 // any stored information needs to be updated (by the caller).
-func Luksify(label string) (string, error) {
-	// blkid
-	persistent, b, err := FindPartition(label)
+func Luksify(label, version string, tpm bool) (string, error) {
+	var pass string
+	if version == "" {
+		version = "luks1"
+	}
+	if version != "luks1" && version != "luks2" {
+		return "", fmt.Errorf("version must be luks1 or luks2")
+	}
+
+	part, b, err := FindPartition(label)
 	if err != nil {
 		return "", err
 	}
 
-	pass, err := GetPassword(b)
-	if err != nil {
-		return "", err
+	if tpm {
+		// On TPM locking we generate a random password that will only be used here then discarded.
+		// only unlocking method will be PCR values
+		pass = rand.String(32)
+	} else {
+		pass, err = GetPassword(b)
+		if err != nil {
+			return "", err
+		}
 	}
 
-	persistent = fmt.Sprintf("/dev/%s", persistent)
+	part = fmt.Sprintf("/dev/%s", part)
 	devMapper := fmt.Sprintf("/dev/mapper/%s", b.Name)
 	partUUID := uuid.NewV5(uuid.NamespaceURL, label)
 
-	if err := CreateLuks(persistent, pass, "luks1", []string{"--uuid", partUUID.String()}...); err != nil {
+	extraArgs := []string{"--uuid", partUUID.String()}
+
+	if err := CreateLuks(part, pass, version, extraArgs...); err != nil {
 		return "", err
 	}
+	if tpm {
+		// Enroll PCR values as an unlock method
+		out, err := SH(fmt.Sprintf("systemd-cryptenroll --tpm2-device=auto --tpm2-pcrs=7+8+9 %s", part))
+		if err != nil {
+			return "", fmt.Errorf("err: %w, out: %s", err, out)
+		}
+	}
 
-	if err := LuksUnlock(persistent, b.Name, pass); err != nil {
+	if err := LuksUnlock(part, b.Name, pass); err != nil {
 		return "", err
 	}
 
@@ -69,9 +93,9 @@ func Luksify(label string) (string, error) {
 		return "", fmt.Errorf("err: %w, out: %s", err, out)
 	}
 
-	out2, err := SH(fmt.Sprintf("cryptsetup close %s", b.Name))
+	err = luks.Lock(b.Name)
 	if err != nil {
-		return "", fmt.Errorf("err: %w, out: %s", err, out2)
+		return "", fmt.Errorf("err: %w", err)
 	}
 
 	return configpkg.PartitionToString(b), nil
