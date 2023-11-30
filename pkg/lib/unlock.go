@@ -15,7 +15,7 @@ import (
 )
 
 // UnlockAll Unlocks all encrypted devices found in the system
-func UnlockAll() error {
+func UnlockAll(tpm bool) error {
 	bus.Manager.Initialize()
 
 	config, err := configpkg.GetConfiguration(configpkg.ConfigScanDirs)
@@ -52,9 +52,17 @@ func UnlockAll() error {
 				// We mount it under /dev/mapper/DEVICE, so It's pretty easy to check
 				if !utils.Exists(filepath.Join("/dev", "mapper", p.Name)) {
 					fmt.Printf("Unmounted Luks found at '%s' LABEL '%s' \n", filepath.Join("/dev", p.Name), p.FilesystemLabel)
-					err = UnlockDisk(p)
-					if err != nil {
-						fmt.Printf("Unlocking failed: '%s'\n", err.Error())
+					if tpm {
+						out, err := utils.SH(fmt.Sprintf("/usr/lib/systemd/systemd-cryptsetup attach %s %s - tpm2-device=auto", p.Name, filepath.Join("/dev", p.Name)))
+						if err != nil {
+							fmt.Printf("Unlocking failed: '%s'\n", err.Error())
+							fmt.Printf("Unlocking failed, command output: '%s'\n", out)
+						}
+					} else {
+						err = UnlockDisk(p)
+						if err != nil {
+							fmt.Printf("Unlocking failed: '%s'\n", err.Error())
+						}
 					}
 				} else {
 					fmt.Printf("Device %s seems to be mounted at %s, skipping\n", filepath.Join("/dev", p.Name), filepath.Join("/dev", "mapper", p.Name))
