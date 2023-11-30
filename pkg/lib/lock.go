@@ -73,9 +73,14 @@ func Luksify(label, version string, tpm bool) (string, error) {
 	}
 	if tpm {
 		// Enroll PCR values as an unlock method
-		out, err := SH(fmt.Sprintf("systemd-cryptenroll --tpm2-device=auto --tpm2-pcrs=7+8+9 %s", part))
+		args := []string{"--tpm2-device=auto", "--tpm2-pcrs=7+8+9", part}
+		cmd := exec.Command("systemd-cryptenroll", args...)
+		cmd.Stdin = strings.NewReader(pass)
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+		err := cmd.Run()
 		if err != nil {
-			return "", fmt.Errorf("err: %w, out: %s", err, out)
+			return "", err
 		}
 	}
 
@@ -96,6 +101,14 @@ func Luksify(label, version string, tpm bool) (string, error) {
 	err = luks.Lock(b.Name)
 	if err != nil {
 		return "", fmt.Errorf("err: %w", err)
+	}
+
+	if tpm {
+		// Delete password slot from luks device
+		out, err := SH(fmt.Sprintf("systemd-cryptenroll --wipe-slot=password %s", part))
+		if err != nil {
+			return "", fmt.Errorf("err: %w, out: %s", err, out)
+		}
 	}
 
 	return configpkg.PartitionToString(b), nil
