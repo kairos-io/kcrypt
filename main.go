@@ -55,9 +55,15 @@ func main() {
 				UsageText:   "unlock-all",
 				Usage:       "Try to unlock all LUKS partitions",
 				Description: "Typically run during initrd to unlock all the LUKS partitions found",
-				ArgsUsage:   "kcrypt unlock-all",
+				ArgsUsage:   "kcrypt [--tpm] unlock-all",
+				Flags: []cli.Flag{
+					&cli.BoolFlag{
+						Name:  "tpm",
+						Usage: "Use TPM to unlock the partition",
+					},
+				},
 				Action: func(c *cli.Context) error {
-					return lib.UnlockAll()
+					return lib.UnlockAll(c.Bool("tpm"))
 				},
 			},
 			{
