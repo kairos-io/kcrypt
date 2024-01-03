@@ -17,7 +17,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Install Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
       - name: Install earthly
         uses: Luet-lab/luet-install-action@v1
         with:
