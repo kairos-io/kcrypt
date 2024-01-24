@@ -44,14 +44,10 @@ func UnlockAll(tpm bool) error {
 					fmt.Printf("No uuid for %s, skipping\n", p.Name)
 					continue
 				}
-				p.FilesystemLabel, err = config.GetLabelForUUID(volumeUUID)
-				if err != nil {
-					return err
-				}
 				// Check if device is already mounted
 				// We mount it under /dev/mapper/DEVICE, so It's pretty easy to check
 				if !utils.Exists(filepath.Join("/dev", "mapper", p.Name)) {
-					fmt.Printf("Unmounted Luks found at '%s' LABEL '%s' \n", filepath.Join("/dev", p.Name), p.FilesystemLabel)
+					fmt.Printf("Unmounted Luks found at '%s' \n", filepath.Join("/dev", p.Name))
 					if tpm {
 						out, err := utils.SH(fmt.Sprintf("/usr/lib/systemd/systemd-cryptsetup attach %s %s - tpm2-device=auto", p.Name, filepath.Join("/dev", p.Name)))
 						if err != nil {
@@ -59,6 +55,10 @@ func UnlockAll(tpm bool) error {
 							fmt.Printf("Unlocking failed, command output: '%s'\n", out)
 						}
 					} else {
+						p.FilesystemLabel, err = config.GetLabelForUUID(volumeUUID)
+						if err != nil {
+							return err
+						}
 						err = UnlockDisk(p)
 						if err != nil {
 							fmt.Printf("Unlocking failed: '%s'\n", err.Error())
