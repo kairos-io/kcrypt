@@ -12,20 +12,28 @@ import (
 	"github.com/kairos-io/kcrypt/pkg/bus"
 	configpkg "github.com/kairos-io/kcrypt/pkg/config"
 	"github.com/mudler/go-pluggable"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 )
 
 // UnlockAll Unlocks all encrypted devices found in the system
 func UnlockAll(tpm bool) error {
+	logger := log.Logger
+
+	return UnlockAllWithLogger(tpm, logger)
+}
+
+func UnlockAllWithLogger(tpm bool, logger zerolog.Logger) error {
 	bus.Manager.Initialize()
 
 	config, err := configpkg.GetConfiguration(configpkg.ConfigScanDirs)
 	if err != nil {
-		fmt.Printf("Warning: Could not read kcrypt configuration '%s'\n", err.Error())
+		logger.Info().Msgf("Warning: Could not read kcrypt configuration '%s'\n", err.Error())
 	}
 
 	blk, err := ghw.Block()
 	if err != nil {
-		fmt.Printf("Warning: Error reading partitions '%s \n", err.Error())
+		logger.Warn().Msgf("Warning: Error reading partitions '%s \n", err.Error())
 
 		return nil
 	}
@@ -35,24 +43,24 @@ func UnlockAll(tpm bool) error {
 			if p.Type == "crypto_LUKS" {
 				// Get the luks UUID directly from cryptsetup
 				volumeUUID, err := utils.SH(fmt.Sprintf("cryptsetup luksUUID %s", filepath.Join("/dev", p.Name)))
-				fmt.Printf("Got luks UUID %s for partition %s\n", volumeUUID, p.Name)
+				logger.Info().Msgf("Got luks UUID %s for partition %s\n", volumeUUID, p.Name)
 				if err != nil {
 					return err
 				}
 				volumeUUID = strings.TrimSpace(volumeUUID)
 				if volumeUUID == "" {
-					fmt.Printf("No uuid for %s, skipping\n", p.Name)
+					logger.Warn().Msgf("No uuid for %s, skipping\n", p.Name)
 					continue
 				}
 				// Check if device is already mounted
 				// We mount it under /dev/mapper/DEVICE, so It's pretty easy to check
 				if !utils.Exists(filepath.Join("/dev", "mapper", p.Name)) {
-					fmt.Printf("Unmounted Luks found at '%s' \n", filepath.Join("/dev", p.Name))
+					logger.Info().Msgf("Unmounted Luks found at '%s' \n", filepath.Join("/dev", p.Name))
 					if tpm {
 						out, err := utils.SH(fmt.Sprintf("/usr/lib/systemd/systemd-cryptsetup attach %s %s - tpm2-device=auto", p.Name, filepath.Join("/dev", p.Name)))
 						if err != nil {
-							fmt.Printf("Unlocking failed: '%s'\n", err.Error())
-							fmt.Printf("Unlocking failed, command output: '%s'\n", out)
+							logger.Warn().Msgf("Unlocking failed: '%s'\n", err.Error())
+							logger.Warn().Msgf("Unlocking failed, command output: '%s'\n", out)
 						}
 					} else {
 						p.FilesystemLabel, err = config.GetLabelForUUID(volumeUUID)
@@ -61,11 +69,11 @@ func UnlockAll(tpm bool) error {
 						}
 						err = UnlockDisk(p)
 						if err != nil {
-							fmt.Printf("Unlocking failed: '%s'\n", err.Error())
+							logger.Warn().Msgf("Unlocking failed: '%s'\n", err.Error())
 						}
 					}
 				} else {
-					fmt.Printf("Device %s seems to be mounted at %s, skipping\n", filepath.Join("/dev", p.Name), filepath.Join("/dev", "mapper", p.Name))
+					logger.Info().Msgf("Device %s seems to be mounted at %s, skipping\n", filepath.Join("/dev", p.Name), filepath.Join("/dev", "mapper", p.Name))
 				}
 
 			}

@@ -12,6 +12,7 @@ require (
 	github.com/onsi/gomega v1.31.1
 	github.com/otiai10/copy v1.9.0
 	github.com/pkg/errors v0.9.1
+	github.com/rs/zerolog v1.32.0
 	github.com/urfave/cli v1.22.14
 	gopkg.in/yaml.v1 v1.0.0-20140924161607-9f9df34309c0
 	k8s.io/apimachinery v0.26.2
@@ -63,6 +64,7 @@ require (
 	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/klauspost/compress v1.16.5 // indirect
 	github.com/lithammer/fuzzysearch v1.1.8 // indirect
+	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.19 // indirect
 	github.com/mattn/go-runewidth v0.0.14 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
