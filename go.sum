@@ -63,8 +63,8 @@ github.com/dgryski/go-camellia v0.0.0-20191119043421-69a8a13fb23d h1:CPqTNIigGwe
 github.com/dgryski/go-camellia v0.0.0-20191119043421-69a8a13fb23d/go.mod h1:QX5ZVULjAfZJux/W62Y91HvCh9hyW6enAwcrrv/sLj0=
 github.com/docker/cli v23.0.5+incompatible h1:ufWmAOuD3Vmr7JP2G5K3cyuNC4YZWiAsuDEvFVVDafE=
 github.com/docker/cli v23.0.5+incompatible/go.mod h1:JLrzqnKDaYBop7H2jaqPtU4hHvMKP+vjCwu2uszcLI8=
-github.com/docker/distribution v2.8.1+incompatible h1:Q50tZOPR6T/hjNsyc9g8/syEs6bk8XXApsHjKukMl68=
-github.com/docker/distribution v2.8.1+incompatible/go.mod h1:J2gT2udsDAN96Uj4KfcMRqY0/ypR+oyYUYmja8H+y+w=
+github.com/docker/distribution v2.8.2+incompatible h1:T3de5rq0dB1j30rp0sA2rER+m322EBzniBPB6ZIzuh8=
+github.com/docker/distribution v2.8.2+incompatible/go.mod h1:J2gT2udsDAN96Uj4KfcMRqY0/ypR+oyYUYmja8H+y+w=
 github.com/docker/docker v23.0.5+incompatible h1:DaxtlTJjFSnLOXVNUBU1+6kXGz2lpDoEAH6QoxaSg8k=
 github.com/docker/docker v23.0.5+incompatible/go.mod h1:eEKB0N0r5NX/I1kEveEz05bcu8tLC/8azJZsviup8Sk=
 github.com/docker/docker-credential-helpers v0.7.0 h1:xtCHsjxogADNZcdv1pKUHXryefjlVRqWqIhk/uXJp0A=
@@ -149,14 +149,6 @@ github.com/jaypipes/pcidb v1.0.0/go.mod h1:TnYUvqhPBzCKnH34KrIX22kAeEbDCSRJ9cqLR
 github.com/jessevdk/go-flags v1.4.0/go.mod h1:4FA24M0QyGHXBuZZK/XkWh8h0e1EYbRYJSGM75WSRxI=
 github.com/joho/godotenv v1.5.1 h1:7eLL/+HRGLY0ldzfGMeQkb7vMd0as4CfYvUVzLqw0N0=
 github.com/joho/godotenv v1.5.1/go.mod h1:f4LDr5Voq0i2e/R5DDNOoa2zzDfwtkZa6DnEwAbqwq4=
-github.com/kairos-io/kairos-sdk v0.0.24 h1:BhOPrn8Hf8SVEX3eQKS+oJi2UFVL4BYNIl6FjYlni9U=
-github.com/kairos-io/kairos-sdk v0.0.24/go.mod h1:17dpFG2d3Q/TcT86DlLK5nNXEjlSrkYl7bsvO2cpYGE=
-github.com/kairos-io/kairos-sdk v0.0.25 h1:/wQ8lHmmqJgKPaxzLllTgMQNWRje80XKdj8F0XlFXl0=
-github.com/kairos-io/kairos-sdk v0.0.25/go.mod h1:btSB2QAds/WSyIyPxnQ3jueMbkkZ75pHUUCj+yHpthQ=
-github.com/kairos-io/kairos-sdk v0.0.26 h1:whaKHSspkugnn25xVSEJnnG9bu/7jBjxRx5D6QXY1Uw=
-github.com/kairos-io/kairos-sdk v0.0.26/go.mod h1:btSB2QAds/WSyIyPxnQ3jueMbkkZ75pHUUCj+yHpthQ=
-github.com/kairos-io/kairos-sdk v0.0.27 h1:p7361CNAaUYSjShh6bh0bb08S+p19rEy0Ki9seDCJMg=
-github.com/kairos-io/kairos-sdk v0.0.27/go.mod h1:btSB2QAds/WSyIyPxnQ3jueMbkkZ75pHUUCj+yHpthQ=
 github.com/kairos-io/kairos-sdk v0.0.28 h1:vjIUo3uSb6xNbr027XlyOaS0NzIIMXdCB2AzluBFV2o=
 github.com/kairos-io/kairos-sdk v0.0.28/go.mod h1:btSB2QAds/WSyIyPxnQ3jueMbkkZ75pHUUCj+yHpthQ=
 github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 h1:Z9n2FFNUXsshfwJMBgNA0RU6/i7WVaAegv3PtuIHPMs=
