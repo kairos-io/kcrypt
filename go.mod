@@ -3,7 +3,7 @@ module github.com/kairos-io/kcrypt
 go 1.20
 
 require (
-	github.com/anatol/luks.go v0.0.0-20230125211543-ada2562d4206
+	github.com/anatol/luks.go v0.0.0-20230423170605-fb3724ed7db7
 	github.com/gofrs/uuid v4.4.0+incompatible
 	github.com/jaypipes/ghw v0.10.0
 	github.com/kairos-io/kairos-sdk v0.0.30
@@ -62,6 +62,7 @@ require (
 	github.com/itchyny/timefmt-go v0.1.5 // indirect
 	github.com/jaypipes/pcidb v1.0.0 // indirect
 	github.com/joho/godotenv v1.5.1 // indirect
+	github.com/jzelinskie/whirlpool v0.0.0-20201016144138-0675e54bb004 // indirect
 	github.com/klauspost/compress v1.16.5 // indirect
 	github.com/lithammer/fuzzysearch v1.1.8 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect

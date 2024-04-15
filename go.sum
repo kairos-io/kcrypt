@@ -28,6 +28,8 @@ github.com/anatol/devmapper.go v0.0.0-20220907161421-ba4de5fc0fd1 h1:6ok4FQsJFoo
 github.com/anatol/devmapper.go v0.0.0-20220907161421-ba4de5fc0fd1/go.mod h1:k5R4Ie9eQbP4muJljLeun3f1onpMKRSqG/aXMFdCWm4=
 github.com/anatol/luks.go v0.0.0-20230125211543-ada2562d4206 h1:9kfvAJRm75SuSR185WrbYOco0cKFo9IglQfiFyRNvK0=
 github.com/anatol/luks.go v0.0.0-20230125211543-ada2562d4206/go.mod h1:XwLorksvNshI9TH9UOO/WfX7kYIdlljCQi5WPkN7K0c=
+github.com/anatol/luks.go v0.0.0-20230423170605-fb3724ed7db7 h1:Q9DsAuWcdvV/7nK8Vdfzd/JBuCaXJn6ON/1H4gYvw5U=
+github.com/anatol/luks.go v0.0.0-20230423170605-fb3724ed7db7/go.mod h1:Dg5siXjPlu/NB24ivNHK5cOms5u9dLc/GEWaGFb0t3I=
 github.com/anatol/vmtest v0.0.0-20220413190228-7a42f1f6d7b8 h1:t4JGeY9oaF5LB4Rdx9e2wARRRPAYt8Ow4eCf5SwO3fA=
 github.com/atomicgo/cursor v0.0.1/go.mod h1:cBON2QmmrysudxNBFthvMtN32r3jxVRIvzkUiF/RuIk=
 github.com/avast/retry-go v3.0.0+incompatible h1:4SOWQ7Qs+oroOTQOYnAHqelpCO0biHSxpiH9JdtuBj0=
@@ -149,6 +151,8 @@ github.com/jaypipes/pcidb v1.0.0/go.mod h1:TnYUvqhPBzCKnH34KrIX22kAeEbDCSRJ9cqLR
 github.com/jessevdk/go-flags v1.4.0/go.mod h1:4FA24M0QyGHXBuZZK/XkWh8h0e1EYbRYJSGM75WSRxI=
 github.com/joho/godotenv v1.5.1 h1:7eLL/+HRGLY0ldzfGMeQkb7vMd0as4CfYvUVzLqw0N0=
 github.com/joho/godotenv v1.5.1/go.mod h1:f4LDr5Voq0i2e/R5DDNOoa2zzDfwtkZa6DnEwAbqwq4=
+github.com/jzelinskie/whirlpool v0.0.0-20201016144138-0675e54bb004 h1:G+9t9cEtnC9jFiTxyptEKuNIAbiN5ZCQzX2a74lj3xg=
+github.com/jzelinskie/whirlpool v0.0.0-20201016144138-0675e54bb004/go.mod h1:KmHnJWQrgEvbuy0vcvj00gtMqbvNn1L+3YUZLK/B92c=
 github.com/kairos-io/kairos-sdk v0.0.30 h1:wFmUv+v3gEFJw1tZXBBEa8RSWv0/ASIrEe6yacrj88Q=
 github.com/kairos-io/kairos-sdk v0.0.30/go.mod h1:QyUBFFKzea0pfI+30E+i001+YYco7DMKLQRXncKZoYI=
 github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 h1:Z9n2FFNUXsshfwJMBgNA0RU6/i7WVaAegv3PtuIHPMs=
