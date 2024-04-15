@@ -5,7 +5,7 @@ go 1.20
 require (
 	github.com/anatol/luks.go v0.0.0-20230125211543-ada2562d4206
 	github.com/gofrs/uuid v4.4.0+incompatible
-	github.com/jaypipes/ghw v0.10.0
+	github.com/jaypipes/ghw v0.12.0
 	github.com/kairos-io/kairos-sdk v0.0.30
 	github.com/mudler/go-pluggable v0.0.0-20230126220627-7710299a0ae5
 	github.com/onsi/ginkgo/v2 v2.15.0
