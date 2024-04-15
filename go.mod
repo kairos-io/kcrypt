@@ -1,6 +1,8 @@
 module github.com/kairos-io/kcrypt
 
-go 1.20
+go 1.21
+
+toolchain go1.22.2
 
 require (
 	github.com/anatol/luks.go v0.0.0-20230423170605-fb3724ed7db7
@@ -15,7 +17,7 @@ require (
 	github.com/rs/zerolog v1.32.0
 	github.com/urfave/cli v1.22.14
 	gopkg.in/yaml.v1 v1.0.0-20140924161607-9f9df34309c0
-	k8s.io/apimachinery v0.26.2
+	k8s.io/apimachinery v0.29.3
 )
 
 require (
@@ -50,7 +52,7 @@ require (
 	github.com/go-task/slim-sprig v0.0.0-20230315185526-52ccab3ef572 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
-	github.com/golang/protobuf v1.5.3 // indirect
+	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
 	github.com/google/go-containerregistry v0.15.2 // indirect
 	github.com/google/pprof v0.0.0-20230228050547-1710fef4ab10 // indirect
