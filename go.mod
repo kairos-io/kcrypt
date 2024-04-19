@@ -2,6 +2,11 @@ module github.com/kairos-io/kcrypt
 
 go 1.19
 
+replace (
+	github.com/onsi/ginkgo/v2 v2.17.1 => github.com/onsi/ginkgo/v2 v2.12.1
+	github.com/onsi/gomega v1.33.0 => github.com/onsi/gomega v1.28.0
+)
+
 require (
 	github.com/anatol/luks.go v0.0.0-20230423170605-fb3724ed7db7
 	github.com/gofrs/uuid v4.4.0+incompatible
