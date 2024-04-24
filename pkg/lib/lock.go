@@ -6,10 +6,11 @@ import (
 	"github.com/jaypipes/ghw"
 	"github.com/jaypipes/ghw/pkg/block"
 	configpkg "github.com/kairos-io/kcrypt/pkg/config"
-	"k8s.io/apimachinery/pkg/util/rand"
+	"math/rand"
 	"os"
 	"os/exec"
 	"strings"
+	"time"
 )
 
 func CreateLuks(dev, password, version string, cryptsetupArgs ...string) error {
@@ -28,6 +29,17 @@ func CreateLuks(dev, password, version string, cryptsetupArgs ...string) error {
 	}
 
 	return nil
+}
+
+var seededRand = rand.New(rand.NewSource(time.Now().UnixNano()))
+
+func getRandomString(length int) string {
+	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	b := make([]byte, length)
+	for i := range b {
+		b[i] = charset[seededRand.Intn(len(charset))]
+	}
+	return string(b)
 }
 
 // Luksify Take a part label, and recreates it with LUKS. IT OVERWRITES DATA!
@@ -53,7 +65,7 @@ func Luksify(label, version string, tpm bool) (string, error) {
 	if tpm {
 		// On TPM locking we generate a random password that will only be used here then discarded.
 		// only unlocking method will be PCR values
-		pass = rand.String(32)
+		pass = getRandomString(32)
 	} else {
 		pass, err = GetPassword(b)
 		if err != nil {

@@ -20,7 +20,6 @@ require (
 	github.com/rs/zerolog v1.32.0
 	github.com/urfave/cli v1.22.14
 	gopkg.in/yaml.v1 v1.0.0-20140924161607-9f9df34309c0
-	k8s.io/apimachinery v0.30.0
 )
 
 require (
