@@ -57,7 +57,7 @@ func UnlockAllWithLogger(tpm bool, logger zerolog.Logger) error {
 				if !utils.Exists(filepath.Join("/dev", "mapper", p.Name)) {
 					logger.Info().Msgf("Unmounted Luks found at '%s' \n", filepath.Join("/dev", p.Name))
 					if tpm {
-						out, err := utils.SH(fmt.Sprintf("/usr/lib/systemd/systemd-cryptsetup attach %s %s - tpm2-device=auto", p.Name, filepath.Join("/dev", p.Name)))
+						out, err := utils.SH(fmt.Sprintf("/usr/lib/systemd/systemd-cryptsetup attach %s %s - tpm2-device=auto tpm2-pcrs=11", p.Name, filepath.Join("/dev", p.Name)))
 						if err != nil {
 							logger.Warn().Msgf("Unlocking failed: '%s'\n", err.Error())
 							logger.Warn().Msgf("Unlocking failed, command output: '%s'\n", out)
