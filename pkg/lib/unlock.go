@@ -119,15 +119,12 @@ func LuksUnlock(device, mapper, password string) error {
 	dev, err := luks.Open(device)
 	if err != nil {
 		// handle error
-		fmt.Println("on open")
 		return err
 	}
 	defer dev.Close()
 
 	err = dev.Unlock(0, []byte(password), mapper)
 	if err != nil {
-		fmt.Println("on unlock")
-		fmt.Printf("device: %s\nmapper: %s\n", device, mapper)
 		return err
 	}
 	return nil

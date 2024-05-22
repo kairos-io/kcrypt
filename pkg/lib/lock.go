@@ -1,6 +1,7 @@
 package lib
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/gofrs/uuid"
 	"github.com/jaypipes/ghw"
@@ -52,25 +53,29 @@ func Luksify(label string, logger zerolog.Logger) (string, error) {
 
 	part, b, err := FindPartition(label)
 	if err != nil {
+		logger.Err(err).Msg("find partition")
 		return "", err
 	}
 
 	pass, err = GetPassword(b)
 	if err != nil {
+		logger.Err(err).Msg("get password")
 		return "", err
 	}
 
+	mapper := fmt.Sprintf("/dev/mapper/%s", b.Name)
 	device := fmt.Sprintf("/dev/%s", part)
 	partUUID := uuid.NewV5(uuid.NamespaceURL, label)
 	extraArgs := []string{"--uuid", partUUID.String()}
 
 	if err := CreateLuks(device, pass, extraArgs...); err != nil {
+		logger.Err(err).Msg("create luks")
 		return "", err
 	}
 
-	mapper := fmt.Sprintf("/dev/mapper/%s", b.Name)
 	err = formatLuks(device, b.Name, mapper, label, pass, logger)
 	if err != nil {
+		logger.Err(err).Msg("format luks")
 		return "", err
 	}
 
@@ -100,13 +105,13 @@ func LuksifyMeasurements(label string, publicKeyPcrs []string, pcrs []string, lo
 	// On TPM locking we generate a random password that will only be used here then discarded.
 	// only unlocking method will be PCR values
 	pass := getRandomString(32)
-
-	part = fmt.Sprintf("/dev/%s", part)
+	mapper := fmt.Sprintf("/dev/mapper/%s", b.Name)
+	device := fmt.Sprintf("/dev/%s", part)
 	partUUID := uuid.NewV5(uuid.NamespaceURL, label)
 
 	extraArgs := []string{"--uuid", partUUID.String()}
 
-	if err := CreateLuks(part, pass, extraArgs...); err != nil {
+	if err := CreateLuks(device, pass, extraArgs...); err != nil {
 		return err
 	}
 
@@ -132,25 +137,26 @@ func LuksifyMeasurements(label string, publicKeyPcrs []string, pcrs []string, lo
 	logger.Debug().Str("args", strings.Join(args, " ")).Msg("running command")
 	cmd := exec.Command("systemd-cryptenroll", args...)
 	cmd.Env = append(cmd.Env, fmt.Sprintf("PASSWORD=%s", pass), "SYSTEMD_LOG_LEVEL=debug") // cannot pass it via stdin
-
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
+	// Store the output into a buffer to log it in case we need it
+	// debug output goes to stderr for some reason?
+	stdOut := bytes.Buffer{}
+	cmd.Stdout = &stdOut
+	cmd.Stderr = &stdOut
 	err = cmd.Run()
 	if err != nil {
+		logger.Debug().Str("output", stdOut.String()).Msg("debug from cryptenroll")
 		logger.Err(err).Msg("Enrolling measurements")
 		return err
 	}
 
-	mapper := fmt.Sprintf("/dev/mapper/%s", b.Name)
-
-	err = formatLuks(part, b.Name, mapper, label, pass, logger)
+	err = formatLuks(device, b.Name, mapper, label, pass, logger)
 	if err != nil {
 		logger.Err(err).Msg("format luks")
 		return err
 	}
 
 	// Delete password slot from luks device
-	out, err := SH(fmt.Sprintf("systemd-cryptenroll --wipe-slot=password %s", part))
+	out, err := SH(fmt.Sprintf("systemd-cryptenroll --wipe-slot=password %s", device))
 	if err != nil {
 		logger.Err(err).Str("out", out).Msg("Removing password")
 		return err
@@ -203,5 +209,5 @@ func FindPartition(label string) (string, *block.Partition, error) {
 		return "", nil, err
 	}
 
-	return "", nil, fmt.Errorf("not found")
+	return "", nil, fmt.Errorf("not found label %s", label)
 }
