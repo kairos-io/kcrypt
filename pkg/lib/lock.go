@@ -6,10 +6,12 @@ import (
 	"github.com/jaypipes/ghw"
 	"github.com/jaypipes/ghw/pkg/block"
 	configpkg "github.com/kairos-io/kcrypt/pkg/config"
+	"github.com/rs/zerolog"
 	"math/rand"
 	"os"
 	"os/exec"
 	"strings"
+	"syscall"
 	"time"
 )
 
@@ -45,7 +47,7 @@ func getRandomString(length int) string {
 // This is because the label of the encrypted partition is not accessible unless
 // the partition is decrypted first and the uuid changed after encryption so
 // any stored information needs to be updated (by the caller).
-func Luksify(label string) (string, error) {
+func Luksify(label string, logger zerolog.Logger) (string, error) {
 	var pass string
 
 	part, b, err := FindPartition(label)
@@ -58,15 +60,16 @@ func Luksify(label string) (string, error) {
 		return "", err
 	}
 
-	part = fmt.Sprintf("/dev/%s", part)
+	device := fmt.Sprintf("/dev/%s", part)
 	partUUID := uuid.NewV5(uuid.NamespaceURL, label)
 	extraArgs := []string{"--uuid", partUUID.String()}
 
-	if err := CreateLuks(part, pass, extraArgs...); err != nil {
+	if err := CreateLuks(device, pass, extraArgs...); err != nil {
 		return "", err
 	}
 
-	err = formatLuks(part, label, pass)
+	mapper := fmt.Sprintf("/dev/mapper/%s", b.Name)
+	err = formatLuks(device, b.Name, mapper, label, pass, logger)
 	if err != nil {
 		return "", err
 	}
@@ -88,8 +91,8 @@ func Luksify(label string) (string, error) {
 // It can also be used to bind to things like the firmware code or efi drivers that we dont expect to change
 // default for publicKeyPcrs is 11
 // default for pcrs is nothing, so it doesn't bind as we want to expand things like DBX and be able to blacklist certs and such
-func LuksifyMeasurements(label string, publicKeyPcrs []string, pcrs []string) error {
-	part, _, err := FindPartition(label)
+func LuksifyMeasurements(label string, publicKeyPcrs []string, pcrs []string, logger zerolog.Logger) error {
+	part, b, err := FindPartition(label)
 	if err != nil {
 		return err
 	}
@@ -111,6 +114,8 @@ func LuksifyMeasurements(label string, publicKeyPcrs []string, pcrs []string) er
 		publicKeyPcrs = []string{"11"}
 	}
 
+	syscall.Sync()
+
 	// Enroll PCR policy as a keyslot
 	// We pass the current signature of the booted system to confirm that we would be able to unlock with the current booted system
 	// That checks the policy against the signatures and fails if a UKI with those signatures wont be able to unlock the device
@@ -124,24 +129,31 @@ func LuksifyMeasurements(label string, publicKeyPcrs []string, pcrs []string) er
 		"--tpm2-signature=/run/systemd/tpm2-pcr-signature.json",
 		"--tpm2-device-key=/run/systemd/tpm2-srk-public-key.tpm2b_public",
 		part}
+	logger.Debug().Str("args", strings.Join(args, " ")).Msg("running command")
 	cmd := exec.Command("systemd-cryptenroll", args...)
-	cmd.Env = append(cmd.Env, fmt.Sprintf("PASSWORD=%s", pass)) // cannot pass it via stdin
+	cmd.Env = append(cmd.Env, fmt.Sprintf("PASSWORD=%s", pass), "SYSTEMD_LOG_LEVEL=debug") // cannot pass it via stdin
+
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	err = cmd.Run()
 	if err != nil {
+		logger.Err(err).Msg("Enrolling measurements")
 		return err
 	}
 
-	err = formatLuks(part, label, pass)
+	mapper := fmt.Sprintf("/dev/mapper/%s", b.Name)
+
+	err = formatLuks(part, b.Name, mapper, label, pass, logger)
 	if err != nil {
+		logger.Err(err).Msg("format luks")
 		return err
 	}
 
 	// Delete password slot from luks device
 	out, err := SH(fmt.Sprintf("systemd-cryptenroll --wipe-slot=password %s", part))
 	if err != nil {
-		return fmt.Errorf("err: %w, out: %s", err, out)
+		logger.Err(err).Str("out", out).Msg("Removing password")
+		return err
 	}
 	return nil
 }
@@ -150,23 +162,26 @@ func LuksifyMeasurements(label string, publicKeyPcrs []string, pcrs []string) er
 // device is the actual /dev/X luks device
 // label is the label we will set to the formatted partition
 // password is the pass to unlock the device to be able to format the underlying mapper
-func formatLuks(device, label, pass string) error {
-	devMapper := fmt.Sprintf("/dev/mapper/%s", device)
-
-	if err := LuksUnlock(device, device, pass); err != nil {
+func formatLuks(device, name, mapper, label, pass string, logger zerolog.Logger) error {
+	l := logger.With().Str("device", device).Str("name", name).Str("mapper", mapper).Logger()
+	l.Debug().Msg("unlock")
+	if err := LuksUnlock(device, name, pass); err != nil {
 		return fmt.Errorf("unlock err: %w", err)
 	}
-	if err := Waitdevice(devMapper, 10); err != nil {
+
+	l.Debug().Msg("wait device")
+	if err := Waitdevice(mapper, 10); err != nil {
 		return fmt.Errorf("waitdevice err: %w", err)
 	}
 
-	cmdFormat := fmt.Sprintf("mkfs.ext4 -L %s %s", label, devMapper)
+	l.Debug().Msg("format")
+	cmdFormat := fmt.Sprintf("mkfs.ext4 -L %s %s", label, mapper)
 	out, err := SH(cmdFormat)
 	if err != nil {
 		return fmt.Errorf("mkfs err: %w, out: %s", err, out)
 	}
-
-	out, err = SH(fmt.Sprintf("cryptsetup close %s", device))
+	l.Debug().Msg("close")
+	out, err = SH(fmt.Sprintf("cryptsetup close %s", mapper))
 	if err != nil {
 		return fmt.Errorf("lock err: %w, out: %s", err, out)
 	}

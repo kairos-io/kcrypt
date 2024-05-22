@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/rs/zerolog"
 	"os"
 
 	"github.com/kairos-io/kcrypt/pkg/lib"
@@ -47,10 +48,11 @@ func main() {
 					if c.NArg() != 1 {
 						return fmt.Errorf("requires 1 arg, the partition label")
 					}
+					log := zerolog.New(os.Stdout).With().Timestamp().Logger()
 					if c.Bool("tpm") {
-						err = lib.LuksifyMeasurements(c.Args().First(), c.StringSlice("tpm-pcrs"), c.StringSlice("public-key-pcrs"))
+						err = lib.LuksifyMeasurements(c.Args().First(), c.StringSlice("tpm-pcrs"), c.StringSlice("public-key-pcrs"), log)
 					} else {
-						out, err = lib.Luksify(c.Args().First())
+						out, err = lib.Luksify(c.Args().First(), log)
 						fmt.Println(out)
 					}
 					if err != nil {
