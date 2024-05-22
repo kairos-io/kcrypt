@@ -25,27 +25,38 @@ func main() {
 				Name:        "encrypt",
 				Description: "Encrypts a partition",
 				Usage:       "Encrypts a partition",
-				ArgsUsage:   "kcrypt [--version VERSION] [--tpm] LABEL",
+				ArgsUsage:   "kcrypt [--tpm] [--tpm-pcrs] [--public-key-pcrs] LABEL",
 				Flags: []cli.Flag{
-					&cli.StringFlag{
-						Name:  "version",
-						Value: "luks1",
-						Usage: "luks version to use",
-					},
 					&cli.BoolFlag{
 						Name:  "tpm",
-						Usage: "Use TPM to lock the partition",
+						Usage: "Use TPM measurements to lock the partition",
+					},
+					&cli.StringSliceFlag{
+						Name:  "tpm-pcrs",
+						Usage: "tpm pcrs to bind to (single measurement)",
+					},
+					&cli.StringSliceFlag{
+						Name:  "public-key-pcrs",
+						Usage: "public key pcrs to bind to (policy)",
+						Value: &cli.StringSlice{"11"},
 					},
 				},
 				Action: func(c *cli.Context) error {
+					var err error
+					var out string
 					if c.NArg() != 1 {
 						return fmt.Errorf("requires 1 arg, the partition label")
 					}
-					out, err := lib.Luksify(c.Args().First(), c.String("version"), c.Bool("tpm"))
+					if c.Bool("tpm") {
+						err = lib.LuksifyMeasurements(c.Args().First(), c.StringSlice("tpm-pcrs"), c.StringSlice("public-key-pcrs"))
+					} else {
+						out, err = lib.Luksify(c.Args().First())
+						fmt.Println(out)
+					}
 					if err != nil {
 						return err
 					}
-					fmt.Println(out)
+
 					return nil
 				},
 			},
