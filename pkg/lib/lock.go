@@ -2,15 +2,16 @@ package lib
 
 import (
 	"fmt"
-	"github.com/gofrs/uuid"
-	"github.com/jaypipes/ghw"
-	"github.com/jaypipes/ghw/pkg/block"
-	configpkg "github.com/kairos-io/kcrypt/pkg/config"
 	"math/rand"
 	"os"
 	"os/exec"
 	"strings"
 	"time"
+
+	"github.com/gofrs/uuid"
+	"github.com/jaypipes/ghw"
+	"github.com/jaypipes/ghw/pkg/block"
+	configpkg "github.com/kairos-io/kcrypt/pkg/config"
 )
 
 func CreateLuks(dev, password, version string, cryptsetupArgs ...string) error {
@@ -56,6 +57,13 @@ func Luksify(label, version string, tpm bool) (string, error) {
 	if version != "luks1" && version != "luks2" {
 		return "", fmt.Errorf("version must be luks1 or luks2")
 	}
+
+	// Make sure ghw will see all partitions correctly
+	out, err := SH("udevadm trigger --settle -v --type=all")
+	if err != nil {
+		return "", fmt.Errorf("udevadm trigger failed: %w, out: %s", err, out)
+	}
+	SH("sync") //nolint:errcheck
 
 	part, b, err := FindPartition(label)
 	if err != nil {
@@ -109,7 +117,7 @@ func Luksify(label, version string, tpm bool) (string, error) {
 	}
 
 	cmd := fmt.Sprintf("mkfs.ext4 -L %s %s", label, devMapper)
-	out, err := SH(cmd)
+	out, err = SH(cmd)
 	if err != nil {
 		return "", fmt.Errorf("mkfs err: %w, out: %s", err, out)
 	}
