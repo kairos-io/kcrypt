@@ -14,6 +14,7 @@ import (
 	"github.com/jaypipes/ghw"
 	"github.com/jaypipes/ghw/pkg/block"
 	configpkg "github.com/kairos-io/kcrypt/pkg/config"
+	"github.com/rs/zerolog"
 )
 
 func CreateLuks(dev, password string, cryptsetupArgs ...string) error {
