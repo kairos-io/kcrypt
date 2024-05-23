@@ -3,17 +3,17 @@ package lib
 import (
 	"bytes"
 	"fmt"
-	"github.com/gofrs/uuid"
-	"github.com/jaypipes/ghw"
-	"github.com/jaypipes/ghw/pkg/block"
-	configpkg "github.com/kairos-io/kcrypt/pkg/config"
-	"github.com/rs/zerolog"
 	"math/rand"
 	"os"
 	"os/exec"
 	"strings"
 	"syscall"
 	"time"
+
+	"github.com/gofrs/uuid"
+	"github.com/jaypipes/ghw"
+	"github.com/jaypipes/ghw/pkg/block"
+	configpkg "github.com/kairos-io/kcrypt/pkg/config"
 )
 
 func CreateLuks(dev, password string, cryptsetupArgs ...string) error {
@@ -50,6 +50,13 @@ func getRandomString(length int) string {
 // any stored information needs to be updated (by the caller).
 func Luksify(label string, logger zerolog.Logger) (string, error) {
 	var pass string
+
+	// Make sure ghw will see all partitions correctly
+	out, err := SH("udevadm trigger --settle -v --type=all")
+	if err != nil {
+		return "", fmt.Errorf("udevadm trigger failed: %w, out: %s", err, out)
+	}
+	SH("sync") //nolint:errcheck
 
 	part, b, err := FindPartition(label)
 	if err != nil {

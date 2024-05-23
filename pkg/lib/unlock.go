@@ -38,6 +38,12 @@ func UnlockAllWithLogger(tpm bool, logger zerolog.Logger) error {
 		return nil
 	}
 
+	logger.Info().Msgf("triggering udev to populate disk info")
+	_, err = utils.SH("udevadm trigger -v --type=all")
+	if err != nil {
+		return err
+	}
+
 	for _, disk := range blk.Disks {
 		for _, p := range disk.Partitions {
 			if p.Type == "crypto_LUKS" {
