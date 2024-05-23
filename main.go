@@ -34,7 +34,7 @@ func main() {
 					},
 					&cli.StringSliceFlag{
 						Name:  "tpm-pcrs",
-						Usage: "tpm pcrs to bind to (single measurement)",
+						Usage: "tpm pcrs to bind to (single measurement) . Only applies when --tpm is also set.",
 					},
 					&cli.StringSliceFlag{
 						Name:  "public-key-pcrs",
