@@ -38,7 +38,7 @@ func main() {
 					},
 					&cli.StringSliceFlag{
 						Name:  "public-key-pcrs",
-						Usage: "public key pcrs to bind to (policy)",
+						Usage: "public key pcrs to bind to (policy). Only applies when --tpm is also set.",
 						Value: &cli.StringSlice{"11"},
 					},
 				},
