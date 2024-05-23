@@ -161,6 +161,8 @@ github.com/kairos-io/kairos-sdk v0.1.5 h1:dk33F9naiHiZlzLTioCz7XQcR8Y6CVRbwE5rxt
 github.com/kairos-io/kairos-sdk v0.1.5/go.mod h1:sR1X4B3F1nkaECQ1vdsJ78OIkfLfyB22/aIpdRQJ/Mo=
 github.com/kairos-io/kairos-sdk v0.1.6 h1:x+oqSvyRgexiJeTbYXpM0ZcJnDbnbRSG4lGNVqDCZc0=
 github.com/kairos-io/kairos-sdk v0.1.6/go.mod h1:sR1X4B3F1nkaECQ1vdsJ78OIkfLfyB22/aIpdRQJ/Mo=
+github.com/kairos-io/kairos-sdk v0.1.8 h1:TKigA+3Nmzn/NLztbLVBLacpx0cK1oJl1AoZarohU98=
+github.com/kairos-io/kairos-sdk v0.1.8/go.mod h1:asSOyJanH10Cnxl9zx5RzyYNMhEworaiMh/7uRnS4GA=
 github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 h1:Z9n2FFNUXsshfwJMBgNA0RU6/i7WVaAegv3PtuIHPMs=
 github.com/kisielk/errcheck v1.5.0/go.mod h1:pFxgyoBC7bSaBwPgfKdkLd5X25qrDl4LWUI2bnpBCr8=
 github.com/kisielk/gotool v1.0.0/go.mod h1:XhKaO+MFFWcvkIS/tQcRk01m1F5IRFswLeQ+oQHNcck=
