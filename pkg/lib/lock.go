@@ -58,8 +58,10 @@ func Luksify(label, version string, tpm bool) (string, error) {
 		return "", fmt.Errorf("version must be luks1 or luks2")
 	}
 
-	// Make sure ghw will see all partitions correctly
-	out, err := SH("udevadm trigger --settle -v --type=all")
+	// Make sure ghw will see all partitions correctly.
+	// Some versions of udevadm don't support --settle (e.g. alpine)
+	// and older versions don't have --type=all. Try the simpler version then.
+	out, err := SH("udevadm trigger --settle -v --type=all || udevadm trigger -v")
 	if err != nil {
 		return "", fmt.Errorf("udevadm trigger failed: %w, out: %s", err, out)
 	}
