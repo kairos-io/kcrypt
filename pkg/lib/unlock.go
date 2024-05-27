@@ -38,8 +38,10 @@ func UnlockAllWithLogger(tpm bool, logger zerolog.Logger) error {
 		return nil
 	}
 
+	// Some versions of udevadm don't support --settle (e.g. alpine)
+	// and older versions don't have --type=all. Try the simpler version then.
 	logger.Info().Msgf("triggering udev to populate disk info")
-	_, err = utils.SH("udevadm trigger -v --type=all")
+	_, err = utils.SH("udevadm trigger --settle -v --type=all || udevadm trigger -v")
 	if err != nil {
 		return err
 	}
