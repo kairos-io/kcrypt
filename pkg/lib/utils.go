@@ -24,5 +24,5 @@ func Waitdevice(device string, attempts int) error {
 		}
 		time.Sleep(1 * time.Second)
 	}
-	return fmt.Errorf("no device found")
+	return fmt.Errorf("no device found %s", device)
 }
