@@ -106,6 +106,14 @@ func Luksify(label string, logger zerolog.Logger) (string, error) {
 // default for publicKeyPcrs is 11
 // default for pcrs is nothing, so it doesn't bind as we want to expand things like DBX and be able to blacklist certs and such
 func LuksifyMeasurements(label string, publicKeyPcrs []string, pcrs []string, logger zerolog.Logger) error {
+	// Make sure ghw will see all partitions correctly.
+	// older versions don't have --type=all. Try the simpler version then.
+	out, err := SH("udevadm trigger --type=all || udevadm trigger")
+	if err != nil {
+		return fmt.Errorf("udevadm trigger failed: %w, out: %s", err, out)
+	}
+	syscall.Sync()
+
 	part, b, err := FindPartition(label)
 	if err != nil {
 		return err
@@ -165,7 +173,7 @@ func LuksifyMeasurements(label string, publicKeyPcrs []string, pcrs []string, lo
 	}
 
 	// Delete password slot from luks device
-	out, err := SH(fmt.Sprintf("systemd-cryptenroll --wipe-slot=password %s", device))
+	out, err = SH(fmt.Sprintf("systemd-cryptenroll --wipe-slot=password %s", device))
 	if err != nil {
 		logger.Err(err).Str("out", out).Msg("Removing password")
 		return err
