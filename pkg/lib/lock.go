@@ -53,13 +53,12 @@ func Luksify(label string, logger zerolog.Logger) (string, error) {
 	var pass string
 
 	// Make sure ghw will see all partitions correctly.
-	// Some versions of udevadm don't support --settle (e.g. alpine)
-	// and older versions don't have --type=all. Try the simpler version then.
-	out, err := SH("udevadm trigger --settle -v --type=all || udevadm trigger -v")
+	// older versions don't have --type=all. Try the simpler version then.
+	out, err := SH("udevadm trigger settle --type=all || udevadm trigger")
 	if err != nil {
 		return "", fmt.Errorf("udevadm trigger failed: %w, out: %s", err, out)
 	}
-	SH("sync") //nolint:errcheck
+	syscall.Sync()
 
 	part, b, err := FindPartition(label)
 	if err != nil {
