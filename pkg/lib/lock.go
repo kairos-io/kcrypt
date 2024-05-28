@@ -54,7 +54,7 @@ func Luksify(label string, logger zerolog.Logger) (string, error) {
 
 	// Make sure ghw will see all partitions correctly.
 	// older versions don't have --type=all. Try the simpler version then.
-	out, err := SH("udevadm trigger settle --type=all || udevadm trigger")
+	out, err := SH("udevadm trigger --type=all || udevadm trigger")
 	if err != nil {
 		return "", fmt.Errorf("udevadm trigger failed: %w, out: %s", err, out)
 	}
