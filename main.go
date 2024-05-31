@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
-	"github.com/rs/zerolog"
 	"os"
 
+	"github.com/rs/zerolog"
+
 	"github.com/kairos-io/kcrypt/pkg/lib"
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 )
 
 var Version = "v0.0.0-dev"
@@ -15,12 +16,12 @@ func main() {
 	app := &cli.App{
 		Name:        "kairos-kcrypt",
 		Version:     Version,
-		Author:      "Ettore Di Giacinto",
+		Authors:     []*cli.Author{&cli.Author{Name: "Ettore Di Giacinto"}},
 		Usage:       "kairos escrow key agent component",
 		Description: ``,
 		UsageText:   ``,
 		Copyright:   "Ettore Di Giacinto",
-		Commands: []cli.Command{
+		Commands: []*cli.Command{
 			{
 
 				Name:        "encrypt",
@@ -39,7 +40,7 @@ func main() {
 					&cli.StringSliceFlag{
 						Name:  "public-key-pcrs",
 						Usage: "public key pcrs to bind to (policy). Only applies when --tpm is also set.",
-						Value: &cli.StringSlice{"11"},
+						Value: cli.NewStringSlice("11"),
 					},
 				},
 				Action: func(c *cli.Context) error {
@@ -87,7 +88,7 @@ func main() {
 					if c.NArg() != 2 {
 						return fmt.Errorf("requires 3 args. initrd,, dst")
 					}
-					return lib.ExtractInitrd(c.Args()[0], c.Args()[1])
+					return lib.ExtractInitrd(c.Args().First(), c.Args().Get(1))
 				},
 			},
 			{
@@ -97,7 +98,7 @@ func main() {
 					if c.NArg() != 3 {
 						return fmt.Errorf("requires 3 args. initrd, srcfile, dst")
 					}
-					return lib.InjectInitrd(c.Args()[0], c.Args()[1], c.Args()[2])
+					return lib.InjectInitrd(c.Args().First(), c.Args().Get(1), c.Args().Get(2))
 				},
 			},
 		},
