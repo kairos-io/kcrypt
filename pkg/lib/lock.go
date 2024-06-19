@@ -150,7 +150,7 @@ func LuksifyMeasurements(label string, publicKeyPcrs []string, pcrs []string, lo
 		fmt.Sprintf("--tpm2-pcrs=%s", strings.Join(pcrs, "+")),
 		"--tpm2-signature=/run/systemd/tpm2-pcr-signature.json",
 		"--tpm2-device-key=/run/systemd/tpm2-srk-public-key.tpm2b_public",
-		part}
+		device}
 	logger.Debug().Str("args", strings.Join(args, " ")).Msg("running command")
 	cmd := exec.Command("systemd-cryptenroll", args...)
 	cmd.Env = append(cmd.Env, fmt.Sprintf("PASSWORD=%s", pass), "SYSTEMD_LOG_LEVEL=debug") // cannot pass it via stdin
@@ -165,6 +165,8 @@ func LuksifyMeasurements(label string, publicKeyPcrs []string, pcrs []string, lo
 		logger.Err(err).Msg("Enrolling measurements")
 		return err
 	}
+
+	logger.Debug().Str("output", stdOut.String()).Msg("debug from cryptenroll")
 
 	err = formatLuks(device, b.Name, mapper, label, pass, logger)
 	if err != nil {
