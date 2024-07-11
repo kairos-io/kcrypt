@@ -4,11 +4,12 @@ VERSION 0.6
 # Framework images should use our initrd
 ARG BASE_IMAGE=quay.io/kairos/core-opensuse
 # renovate: datasource=docker depName=golang
-ARG GO_VERSION=1.20.2
+ARG GO_VERSION=1.22
 ARG GOLINT_VERSION=1.52.2
 
 build-kcrypt:
-    FROM golang:alpine
+    ARG GO_VERSION
+    FROM golang:$GO_VERSION-alpine
     RUN apk add git
     COPY . /work
     WORKDIR /work
