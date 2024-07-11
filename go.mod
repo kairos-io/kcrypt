@@ -1,11 +1,6 @@
 module github.com/kairos-io/kcrypt
 
-go 1.19
-
-replace (
-	github.com/onsi/ginkgo/v2 v2.17.1 => github.com/onsi/ginkgo/v2 v2.12.1
-	github.com/onsi/gomega v1.33.0 => github.com/onsi/gomega v1.28.0
-)
+go 1.22
 
 require (
 	github.com/anatol/luks.go v0.0.0-20230423170605-fb3724ed7db7
@@ -20,7 +15,6 @@ require (
 	github.com/rs/zerolog v1.33.0
 	github.com/urfave/cli/v2 v2.27.2
 	gopkg.in/yaml.v1 v1.0.0-20140924161607-9f9df34309c0
-	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
@@ -100,5 +94,6 @@ require (
 	google.golang.org/grpc v1.58.3 // indirect
 	google.golang.org/protobuf v1.33.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
 	howett.net/plist v1.0.0 // indirect
 )
