@@ -3,7 +3,7 @@ module github.com/kairos-io/kcrypt
 go 1.22
 
 require (
-	github.com/anatol/luks.go v0.0.0-20230423170605-fb3724ed7db7
+	github.com/anatol/luks.go v0.0.0-20240507052915-92f8bb765f98
 	github.com/gofrs/uuid v4.4.0+incompatible
 	github.com/jaypipes/ghw v0.12.0
 	github.com/kairos-io/kairos-sdk v0.1.8
@@ -24,7 +24,7 @@ require (
 	github.com/Microsoft/go-winio v0.6.1 // indirect
 	github.com/Microsoft/hcsshim v0.11.4 // indirect
 	github.com/StackExchange/wmi v1.2.1 // indirect
-	github.com/anatol/devmapper.go v0.0.0-20220907161421-ba4de5fc0fd1 // indirect
+	github.com/anatol/devmapper.go v0.0.0-20230829043248-59ac2b9706ba // indirect
 	github.com/avast/retry-go v3.0.0+incompatible // indirect
 	github.com/aybabtme/rgbterm v0.0.0-20170906152045-cc83f3b3ce59 // indirect
 	github.com/chuckpreslar/emission v0.0.0-20170206194824-a7ddd980baf9 // indirect
@@ -86,7 +86,7 @@ require (
 	golang.org/x/mod v0.15.0 // indirect
 	golang.org/x/net v0.23.0 // indirect
 	golang.org/x/sync v0.6.0 // indirect
-	golang.org/x/sys v0.19.0 // indirect
+	golang.org/x/sys v0.20.0 // indirect
 	golang.org/x/term v0.19.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	golang.org/x/tools v0.18.0 // indirect
