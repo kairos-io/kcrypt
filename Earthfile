@@ -5,6 +5,7 @@ VERSION 0.6
 ARG BASE_IMAGE=quay.io/kairos/core-opensuse
 # renovate: datasource=docker depName=golang
 ARG GO_VERSION=1.22
+# renovate: datasource=docker depName=golangci-lint
 ARG GOLINT_VERSION=1.52.2
 
 build-kcrypt:
