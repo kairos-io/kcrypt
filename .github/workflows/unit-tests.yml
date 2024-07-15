@@ -21,9 +21,6 @@ jobs:
         with:
           go-version: ${{ matrix.go-version }}
 
-      - name: Install Ginkgo
-        run: go install github.com/onsi/ginkgo/v2/ginkgo@v2.5.0
-
       - name: Run tests
         run: |
-          ginkgo run ./...
+          go run github.com/onsi/ginkgo/v2/ginkgo ./...
