@@ -11,7 +11,7 @@ import (
 	"github.com/jaypipes/ghw/pkg/block"
 	"github.com/kairos-io/kairos-sdk/collector"
 	"github.com/pkg/errors"
-	"gopkg.in/yaml.v1"
+	"gopkg.in/yaml.v3"
 )
 
 // There are the directories under which we expect to find kairos configuration.
