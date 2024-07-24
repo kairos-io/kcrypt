@@ -49,7 +49,7 @@ func getRandomString(length int) string {
 // This is because the label of the encrypted partition is not accessible unless
 // the partition is decrypted first and the uuid changed after encryption so
 // any stored information needs to be updated (by the caller).
-func Luksify(label string, logger zerolog.Logger) (string, error) {
+func Luksify(label string, logger zerolog.Logger, argsCreate ...string) (string, error) {
 	var pass string
 
 	// Make sure ghw will see all partitions correctly.
@@ -74,8 +74,9 @@ func Luksify(label string, logger zerolog.Logger) (string, error) {
 
 	mapper := fmt.Sprintf("/dev/mapper/%s", b.Name)
 	device := fmt.Sprintf("/dev/%s", part)
-	partUUID := uuid.NewV5(uuid.NamespaceURL, label)
-	extraArgs := []string{"--uuid", partUUID.String()}
+
+	extraArgs := []string{"--uuid", uuid.NewV5(uuid.NamespaceURL, label).String()}
+	extraArgs = append(extraArgs, argsCreate...)
 
 	if err := CreateLuks(device, pass, extraArgs...); err != nil {
 		logger.Err(err).Msg("create luks")
@@ -105,7 +106,7 @@ func Luksify(label string, logger zerolog.Logger) (string, error) {
 // It can also be used to bind to things like the firmware code or efi drivers that we dont expect to change
 // default for publicKeyPcrs is 11
 // default for pcrs is nothing, so it doesn't bind as we want to expand things like DBX and be able to blacklist certs and such
-func LuksifyMeasurements(label string, publicKeyPcrs []string, pcrs []string, logger zerolog.Logger) error {
+func LuksifyMeasurements(label string, publicKeyPcrs []string, pcrs []string, logger zerolog.Logger, argsCreate ...string) error {
 	// Make sure ghw will see all partitions correctly.
 	// older versions don't have --type=all. Try the simpler version then.
 	out, err := SH("udevadm trigger --type=all || udevadm trigger")
@@ -124,9 +125,9 @@ func LuksifyMeasurements(label string, publicKeyPcrs []string, pcrs []string, lo
 	pass := getRandomString(32)
 	mapper := fmt.Sprintf("/dev/mapper/%s", b.Name)
 	device := fmt.Sprintf("/dev/%s", part)
-	partUUID := uuid.NewV5(uuid.NamespaceURL, label)
 
-	extraArgs := []string{"--uuid", partUUID.String()}
+	extraArgs := []string{"--uuid", uuid.NewV5(uuid.NamespaceURL, label).String()}
+	extraArgs = append(extraArgs, argsCreate...)
 
 	if err := CreateLuks(device, pass, extraArgs...); err != nil {
 		return err
