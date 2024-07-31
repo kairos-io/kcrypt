@@ -130,7 +130,6 @@ func LuksUnlock(device, mapper, password string) error {
 		return err
 	}
 	defer dev.Close()
-
 	err = dev.Unlock(0, []byte(password), mapper)
 	if err != nil {
 		return err

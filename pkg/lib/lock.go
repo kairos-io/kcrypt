@@ -206,11 +206,19 @@ func formatLuks(device, name, mapper, label, pass string, logger zerolog.Logger)
 	if err != nil {
 		return fmt.Errorf("mkfs err: %w, out: %s", err, out)
 	}
+
+	l.Debug().Msg("discards")
+	out, err = SH(fmt.Sprintf("cryptsetup refresh --persistent --allow-discards %s", mapper))
+	if err != nil {
+		return fmt.Errorf("refresh err: %w, out: %s", err, out)
+	}
+
 	l.Debug().Msg("close")
 	out, err = SH(fmt.Sprintf("cryptsetup close %s", mapper))
 	if err != nil {
 		return fmt.Errorf("lock err: %w, out: %s", err, out)
 	}
+
 	return nil
 }
 
