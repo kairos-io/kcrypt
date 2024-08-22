@@ -6,7 +6,7 @@ require (
 	github.com/anatol/luks.go v0.0.0-20240507052915-92f8bb765f98
 	github.com/gofrs/uuid v4.4.0+incompatible
 	github.com/jaypipes/ghw v0.12.0
-	github.com/kairos-io/kairos-sdk v0.3.2
+	github.com/kairos-io/kairos-sdk v0.4.1
 	github.com/mudler/go-pluggable v0.0.0-20230126220627-7710299a0ae5
 	github.com/onsi/ginkgo/v2 v2.20.1
 	github.com/onsi/gomega v1.34.1
@@ -39,9 +39,9 @@ require (
 	github.com/denisbrodbeck/machineid v1.0.1 // indirect
 	github.com/dgryski/go-camellia v0.0.0-20191119043421-69a8a13fb23d // indirect
 	github.com/distribution/reference v0.6.0 // indirect
-	github.com/docker/cli v24.0.0+incompatible // indirect
+	github.com/docker/cli v27.1.1+incompatible // indirect
 	github.com/docker/distribution v2.8.2+incompatible // indirect
-	github.com/docker/docker v27.1.1+incompatible // indirect
+	github.com/docker/docker v27.1.2+incompatible // indirect
 	github.com/docker/docker-credential-helpers v0.7.0 // indirect
 	github.com/docker/go-connections v0.4.0 // indirect
 	github.com/docker/go-units v0.5.0 // indirect
@@ -55,7 +55,7 @@ require (
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
-	github.com/google/go-containerregistry v0.20.1 // indirect
+	github.com/google/go-containerregistry v0.20.2 // indirect
 	github.com/google/pprof v0.0.0-20240727154555-813a5fbdbec8 // indirect
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510 // indirect
 	github.com/gookit/color v1.5.3 // indirect
