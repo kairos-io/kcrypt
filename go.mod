@@ -1,18 +1,17 @@
 module github.com/kairos-io/kcrypt
 
-go 1.22.5
+go 1.23.1
 
 require (
 	github.com/anatol/luks.go v0.0.0-20240507052915-92f8bb765f98
 	github.com/gofrs/uuid v4.4.0+incompatible
 	github.com/jaypipes/ghw v0.13.0
-	github.com/kairos-io/kairos-sdk v0.4.2
+	github.com/kairos-io/kairos-sdk v0.4.5
 	github.com/mudler/go-pluggable v0.0.0-20230126220627-7710299a0ae5
 	github.com/onsi/ginkgo/v2 v2.20.2
 	github.com/onsi/gomega v1.34.2
 	github.com/otiai10/copy v1.14.0
 	github.com/pkg/errors v0.9.1
-	github.com/rs/zerolog v1.33.0
 	github.com/urfave/cli/v2 v2.27.4
 	gopkg.in/yaml.v3 v3.0.1
 )
@@ -21,6 +20,7 @@ require (
 	atomicgo.dev/cursor v0.1.3 // indirect
 	atomicgo.dev/keyboard v0.2.9 // indirect
 	atomicgo.dev/schedule v0.0.2 // indirect
+	github.com/rs/zerolog v1.33.0 // indirect
 	github.com/Microsoft/go-winio v0.6.2 // indirect
 	github.com/Microsoft/hcsshim v0.11.7 // indirect
 	github.com/StackExchange/wmi v1.2.1 // indirect
@@ -30,7 +30,7 @@ require (
 	github.com/chuckpreslar/emission v0.0.0-20170206194824-a7ddd980baf9 // indirect
 	github.com/containerd/cgroups v1.1.0 // indirect
 	github.com/containerd/console v1.0.3 // indirect
-	github.com/containerd/containerd v1.7.21 // indirect
+	github.com/containerd/containerd v1.7.22 // indirect
 	github.com/containerd/continuity v0.4.2 // indirect
 	github.com/containerd/errdefs v0.1.0 // indirect
 	github.com/containerd/log v0.1.0 // indirect
@@ -41,12 +41,11 @@ require (
 	github.com/distribution/reference v0.6.0 // indirect
 	github.com/docker/cli v27.1.1+incompatible // indirect
 	github.com/docker/distribution v2.8.2+incompatible // indirect
-	github.com/docker/docker v27.2.0+incompatible // indirect
+	github.com/docker/docker v27.2.1+incompatible // indirect
 	github.com/docker/docker-credential-helpers v0.7.0 // indirect
 	github.com/docker/go-connections v0.4.0 // indirect
 	github.com/docker/go-units v0.5.0 // indirect
 	github.com/felixge/httpsnoop v1.0.3 // indirect
-	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/go-logr/logr v1.4.2 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
@@ -94,7 +93,6 @@ require (
 	go.opentelemetry.io/otel/metric v1.21.0 // indirect
 	go.opentelemetry.io/otel/trace v1.21.0 // indirect
 	golang.org/x/crypto v0.26.0 // indirect
-	golang.org/x/exp v0.0.0-20240719175910-8a7402abbf56 // indirect
 	golang.org/x/net v0.28.0 // indirect
 	golang.org/x/sync v0.8.0 // indirect
 	golang.org/x/sys v0.24.0 // indirect
@@ -104,7 +102,5 @@ require (
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20231212172506-995d672761c0 // indirect
 	google.golang.org/grpc v1.59.0 // indirect
 	google.golang.org/protobuf v1.34.1 // indirect
-	gopkg.in/yaml.v1 v1.0.0-20140924161607-9f9df34309c0 // indirect
-	gopkg.in/yaml.v2 v2.4.0 // indirect
 	howett.net/plist v1.0.0 // indirect
 )

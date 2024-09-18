@@ -8,23 +8,23 @@ import (
 	"github.com/anatol/luks.go"
 	"github.com/jaypipes/ghw"
 	"github.com/jaypipes/ghw/pkg/block"
+	"github.com/kairos-io/kairos-sdk/types"
 	"github.com/kairos-io/kairos-sdk/utils"
 	"github.com/kairos-io/kcrypt/pkg/bus"
 	configpkg "github.com/kairos-io/kcrypt/pkg/config"
 	"github.com/mudler/go-pluggable"
-	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
 )
 
 // UnlockAll Unlocks all encrypted devices found in the system
 func UnlockAll(tpm bool) error {
-	logger := log.Logger
+	logger := types.NewKairosLogger("kcrypt-unlock", "info", false)
 
 	return UnlockAllWithLogger(tpm, logger)
 }
 
-func UnlockAllWithLogger(tpm bool, logger zerolog.Logger) error {
+func UnlockAllWithLogger(tpm bool, log types.KairosLogger) error {
 	bus.Manager.Initialize()
+	logger := log.Logger
 
 	config, err := configpkg.GetConfiguration(configpkg.ConfigScanDirs)
 	if err != nil {

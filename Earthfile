@@ -4,7 +4,7 @@ VERSION 0.6
 # Framework images should use our initrd
 ARG BASE_IMAGE=quay.io/kairos/core-opensuse
 # renovate: datasource=docker depName=golang
-ARG GO_VERSION=1.22
+ARG GO_VERSION=1.23
 # renovate: datasource=docker depName=golangci-lint
 ARG GOLINT_VERSION=1.59.1
 

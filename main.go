@@ -4,8 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/rs/zerolog"
-
+	"github.com/kairos-io/kairos-sdk/types"
 	"github.com/kairos-io/kcrypt/pkg/lib"
 	"github.com/urfave/cli/v2"
 )
@@ -49,7 +48,7 @@ func main() {
 					if c.NArg() != 1 {
 						return fmt.Errorf("requires 1 arg, the partition label")
 					}
-					log := zerolog.New(os.Stdout).With().Timestamp().Logger()
+					log := types.NewKairosLogger("kcrypt-lock", "info", false)
 					if c.Bool("tpm") {
 						err = lib.LuksifyMeasurements(c.Args().First(), c.StringSlice("tpm-pcrs"), c.StringSlice("public-key-pcrs"), log)
 					} else {

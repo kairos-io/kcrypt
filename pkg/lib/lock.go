@@ -13,8 +13,8 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/jaypipes/ghw"
 	"github.com/jaypipes/ghw/pkg/block"
+	"github.com/kairos-io/kairos-sdk/types"
 	configpkg "github.com/kairos-io/kcrypt/pkg/config"
-	"github.com/rs/zerolog"
 )
 
 func CreateLuks(dev, password string, cryptsetupArgs ...string) error {
@@ -49,7 +49,7 @@ func getRandomString(length int) string {
 // This is because the label of the encrypted partition is not accessible unless
 // the partition is decrypted first and the uuid changed after encryption so
 // any stored information needs to be updated (by the caller).
-func Luksify(label string, logger zerolog.Logger, argsCreate ...string) (string, error) {
+func Luksify(label string, logger types.KairosLogger, argsCreate ...string) (string, error) {
 	var pass string
 
 	// Make sure ghw will see all partitions correctly.
@@ -106,7 +106,7 @@ func Luksify(label string, logger zerolog.Logger, argsCreate ...string) (string,
 // It can also be used to bind to things like the firmware code or efi drivers that we dont expect to change
 // default for publicKeyPcrs is 11
 // default for pcrs is nothing, so it doesn't bind as we want to expand things like DBX and be able to blacklist certs and such
-func LuksifyMeasurements(label string, publicKeyPcrs []string, pcrs []string, logger zerolog.Logger, argsCreate ...string) error {
+func LuksifyMeasurements(label string, publicKeyPcrs []string, pcrs []string, logger types.KairosLogger, argsCreate ...string) error {
 	// Make sure ghw will see all partitions correctly.
 	// older versions don't have --type=all. Try the simpler version then.
 	out, err := SH("udevadm trigger --type=all || udevadm trigger")
@@ -152,7 +152,7 @@ func LuksifyMeasurements(label string, publicKeyPcrs []string, pcrs []string, lo
 		"--tpm2-signature=/run/systemd/tpm2-pcr-signature.json",
 		"--tpm2-device-key=/run/systemd/tpm2-srk-public-key.tpm2b_public",
 		device}
-	logger.Debug().Str("args", strings.Join(args, " ")).Msg("running command")
+	logger.Logger.Debug().Str("args", strings.Join(args, " ")).Msg("running command")
 	cmd := exec.Command("systemd-cryptenroll", args...)
 	cmd.Env = append(cmd.Env, fmt.Sprintf("PASSWORD=%s", pass), "SYSTEMD_LOG_LEVEL=debug") // cannot pass it via stdin
 	// Store the output into a buffer to log it in case we need it
@@ -162,12 +162,12 @@ func LuksifyMeasurements(label string, publicKeyPcrs []string, pcrs []string, lo
 	cmd.Stderr = &stdOut
 	err = cmd.Run()
 	if err != nil {
-		logger.Debug().Str("output", stdOut.String()).Msg("debug from cryptenroll")
+		logger.Logger.Debug().Str("output", stdOut.String()).Msg("debug from cryptenroll")
 		logger.Err(err).Msg("Enrolling measurements")
 		return err
 	}
 
-	logger.Debug().Str("output", stdOut.String()).Msg("debug from cryptenroll")
+	logger.Logger.Debug().Str("output", stdOut.String()).Msg("debug from cryptenroll")
 
 	err = formatLuks(device, b.Name, mapper, label, pass, logger)
 	if err != nil {
@@ -188,8 +188,8 @@ func LuksifyMeasurements(label string, publicKeyPcrs []string, pcrs []string, lo
 // device is the actual /dev/X luks device
 // label is the label we will set to the formatted partition
 // password is the pass to unlock the device to be able to format the underlying mapper
-func formatLuks(device, name, mapper, label, pass string, logger zerolog.Logger) error {
-	l := logger.With().Str("device", device).Str("name", name).Str("mapper", mapper).Logger()
+func formatLuks(device, name, mapper, label, pass string, logger types.KairosLogger) error {
+	l := logger.Logger.With().Str("device", device).Str("name", name).Str("mapper", mapper).Logger()
 	l.Debug().Msg("unlock")
 	if err := LuksUnlock(device, name, pass); err != nil {
 		return fmt.Errorf("unlock err: %w", err)
