@@ -8,7 +8,7 @@ require (
 	github.com/jaypipes/ghw v0.13.0
 	github.com/kairos-io/kairos-sdk v0.6.1
 	github.com/mudler/go-pluggable v0.0.0-20230126220627-7710299a0ae5
-	github.com/onsi/ginkgo/v2 v2.21.0
+	github.com/onsi/ginkgo/v2 v2.22.0
 	github.com/onsi/gomega v1.35.1
 	github.com/otiai10/copy v1.14.0
 	github.com/pkg/errors v0.9.1
