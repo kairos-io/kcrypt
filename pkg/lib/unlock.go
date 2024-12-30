@@ -71,9 +71,11 @@ func UnlockAllWithLogger(tpm bool, log types.KairosLogger) error {
 							logger.Warn().Msgf("Unlocking failed, command output: '%s'\n", out)
 						}
 					} else {
+						logger.Debug().Str("uuid", volumeUUID).Str("uuidp", p.UUID).Msg("Unlocking")
+						p.UUID = volumeUUID
 						p.FilesystemLabel, err = config.GetLabelForUUID(volumeUUID)
 						if err != nil {
-							return err
+							logger.Warn().Msgf("No label found for %s\n", p.Name)
 						}
 						err = UnlockDisk(p)
 						if err != nil {
