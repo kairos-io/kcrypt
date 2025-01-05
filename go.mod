@@ -10,7 +10,7 @@ require (
 	github.com/mudler/go-pluggable v0.0.0-20230126220627-7710299a0ae5
 	github.com/onsi/ginkgo/v2 v2.22.2
 	github.com/onsi/gomega v1.36.2
-	github.com/otiai10/copy v1.14.0
+	github.com/otiai10/copy v1.14.1
 	github.com/pkg/errors v0.9.1
 	github.com/urfave/cli/v2 v2.27.5
 	gopkg.in/yaml.v3 v3.0.1
@@ -77,6 +77,7 @@ require (
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/opencontainers/image-spec v1.1.0 // indirect
+	github.com/otiai10/mint v1.6.3 // indirect
 	github.com/pterm/pterm v0.12.63 // indirect
 	github.com/qeesung/image2ascii v1.0.1 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
