@@ -5,7 +5,7 @@ go 1.23.1
 require (
 	github.com/anatol/luks.go v0.0.0-20240507052915-92f8bb765f98
 	github.com/gofrs/uuid v4.4.0+incompatible
-	github.com/jaypipes/ghw v0.13.0
+	github.com/jaypipes/ghw v0.14.0
 	github.com/kairos-io/kairos-sdk v0.7.3
 	github.com/mudler/go-pluggable v0.0.0-20230126220627-7710299a0ae5
 	github.com/onsi/ginkgo/v2 v2.22.2
@@ -83,6 +83,7 @@ require (
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/rs/zerolog v1.33.0 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
+	github.com/samber/lo v1.47.0 // indirect
 	github.com/sirupsen/logrus v1.9.4-0.20230606125235-dd1b4c2e81af // indirect
 	github.com/twpayne/go-vfs/v4 v4.3.0 // indirect
 	github.com/vbatts/tar-split v0.11.6 // indirect
