@@ -12,7 +12,7 @@ require (
 	github.com/onsi/gomega v1.36.2
 	github.com/otiai10/copy v1.14.1
 	github.com/pkg/errors v0.9.1
-	github.com/urfave/cli/v2 v2.27.5
+	github.com/urfave/cli/v2 v2.27.6
 	gopkg.in/yaml.v3 v3.0.1
 )
 
