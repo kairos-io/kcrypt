@@ -11,7 +11,6 @@ import (
 	"github.com/kairos-io/kairos-sdk/types"
 	"github.com/kairos-io/kairos-sdk/utils"
 	"github.com/kairos-io/kcrypt/pkg/bus"
-	configpkg "github.com/kairos-io/kcrypt/pkg/config"
 	"github.com/mudler/go-pluggable"
 )
 
@@ -25,11 +24,6 @@ func UnlockAll(tpm bool) error {
 func UnlockAllWithLogger(tpm bool, log types.KairosLogger) error {
 	bus.Manager.Initialize()
 	logger := log.Logger
-
-	config, err := configpkg.GetConfiguration(configpkg.ConfigScanDirs)
-	if err != nil {
-		logger.Info().Msgf("Warning: Could not read kcrypt configuration '%s'\n", err.Error())
-	}
 
 	blk, err := ghw.Block()
 	if err != nil {
@@ -71,10 +65,8 @@ func UnlockAllWithLogger(tpm bool, log types.KairosLogger) error {
 							logger.Warn().Msgf("Unlocking failed, command output: '%s'\n", out)
 						}
 					} else {
-						p.FilesystemLabel, err = config.GetLabelForUUID(volumeUUID)
-						if err != nil {
-							return err
-						}
+						logger.Debug().Str("uuid", volumeUUID).Str("uuidp", p.UUID).Msg("Unlocking")
+						p.UUID = volumeUUID
 						err = UnlockDisk(p)
 						if err != nil {
 							logger.Warn().Msgf("Unlocking failed: '%s'\n", err.Error())

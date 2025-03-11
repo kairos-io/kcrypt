@@ -189,7 +189,7 @@ func LuksifyMeasurements(label string, publicKeyPcrs []string, pcrs []string, lo
 // label is the label we will set to the formatted partition
 // password is the pass to unlock the device to be able to format the underlying mapper
 func formatLuks(device, name, mapper, label, pass string, logger types.KairosLogger) error {
-	l := logger.Logger.With().Str("device", device).Str("name", name).Str("mapper", mapper).Logger()
+	l := logger.Logger.With().Str("device", device).Str("label", label).Str("name", name).Str("mapper", mapper).Logger()
 	l.Debug().Msg("unlock")
 	if err := LuksUnlock(device, name, pass); err != nil {
 		return fmt.Errorf("unlock err: %w", err)
@@ -208,9 +208,11 @@ func formatLuks(device, name, mapper, label, pass string, logger types.KairosLog
 	}
 
 	l.Debug().Msg("discards")
-	out, err = SH(fmt.Sprintf("cryptsetup refresh --persistent --allow-discards %s", mapper))
+	cmd := exec.Command("cryptsetup", "refresh", "--persistent", "--allow-discards", mapper)
+	cmd.Stdin = strings.NewReader(pass)
+	output, err := cmd.CombinedOutput()
 	if err != nil {
-		return fmt.Errorf("refresh err: %w, out: %s", err, out)
+		return fmt.Errorf("refresh err: %w, out: %s", err, output)
 	}
 
 	l.Debug().Msg("close")
