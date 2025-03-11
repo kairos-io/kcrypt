@@ -5,7 +5,7 @@ go 1.23.1
 require (
 	github.com/anatol/luks.go v0.0.0-20240507052915-92f8bb765f98
 	github.com/gofrs/uuid v4.4.0+incompatible
-	github.com/jaypipes/ghw v0.14.0
+	github.com/jaypipes/ghw v0.15.0
 	github.com/kairos-io/kairos-sdk v0.7.3
 	github.com/mudler/go-pluggable v0.0.0-20230126220627-7710299a0ae5
 	github.com/onsi/ginkgo/v2 v2.23.0
