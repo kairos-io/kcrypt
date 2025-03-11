@@ -3,7 +3,6 @@ package lib
 import (
 	"fmt"
 	"path/filepath"
-	"strings"
 
 	"github.com/anatol/luks.go"
 	"github.com/jaypipes/ghw"
@@ -43,17 +42,6 @@ func UnlockAllWithLogger(tpm bool, log types.KairosLogger) error {
 	for _, disk := range blk.Disks {
 		for _, p := range disk.Partitions {
 			if p.Type == "crypto_LUKS" {
-				// Get the luks UUID directly from cryptsetup
-				volumeUUID, err := utils.SH(fmt.Sprintf("cryptsetup luksUUID %s", filepath.Join("/dev", p.Name)))
-				logger.Info().Msgf("Got luks UUID %s for partition %s\n", volumeUUID, p.Name)
-				if err != nil {
-					return err
-				}
-				volumeUUID = strings.TrimSpace(volumeUUID)
-				if volumeUUID == "" {
-					logger.Warn().Msgf("No uuid for %s, skipping\n", p.Name)
-					continue
-				}
 				// Check if device is already mounted
 				// We mount it under /dev/mapper/DEVICE, so It's pretty easy to check
 				if !utils.Exists(filepath.Join("/dev", "mapper", p.Name)) {
@@ -65,13 +53,12 @@ func UnlockAllWithLogger(tpm bool, log types.KairosLogger) error {
 							logger.Warn().Msgf("Unlocking failed, command output: '%s'\n", out)
 						}
 					} else {
-						logger.Debug().Str("uuid", volumeUUID).Str("uuidp", p.UUID).Msg("Unlocking")
-						p.UUID = volumeUUID
 						err = UnlockDisk(p)
 						if err != nil {
 							logger.Warn().Msgf("Unlocking failed: '%s'\n", err.Error())
 						}
 					}
+					logger.Info().Msgf("%s luks mounted at %s\n", filepath.Join("/dev", p.Name), filepath.Join("/dev", "mapper", p.Name))
 				} else {
 					logger.Info().Msgf("Device %s seems to be mounted at %s, skipping\n", filepath.Join("/dev", p.Name), filepath.Join("/dev", "mapper", p.Name))
 				}
