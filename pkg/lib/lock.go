@@ -76,6 +76,7 @@ func Luksify(label string, logger types.KairosLogger, argsCreate ...string) (str
 	device := fmt.Sprintf("/dev/%s", part)
 
 	extraArgs := []string{"--uuid", uuid.NewV5(uuid.NamespaceURL, label).String()}
+	extraArgs = append(extraArgs, "--label", label)
 	extraArgs = append(extraArgs, argsCreate...)
 
 	if err := CreateLuks(device, pass, extraArgs...); err != nil {
