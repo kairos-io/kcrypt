@@ -208,10 +208,14 @@ func formatLuks(device, name, mapper, label, pass string, logger types.KairosLog
 		return fmt.Errorf("mkfs err: %w, out: %s", err, out)
 	}
 
+	// Refresh needs the password as its doing actions on the device directly
 	l.Debug().Msg("discards")
-	out, err = SH(fmt.Sprintf("cryptsetup refresh --persistent --allow-discards %s", mapper))
+	cmd := exec.Command("cryptsetup", "refresh", "--persistent", "--allow-discards", mapper)
+	cmd.Stdin = strings.NewReader(pass)
+	output, err := cmd.CombinedOutput()
+
 	if err != nil {
-		return fmt.Errorf("refresh err: %w, out: %s", err, out)
+		return fmt.Errorf("refresh err: %w, out: %s", err, string(output))
 	}
 
 	l.Debug().Msg("close")
