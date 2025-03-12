@@ -72,8 +72,14 @@ func UnlockAllWithLogger(tpm bool, log types.KairosLogger) error {
 						}
 					} else {
 						p.FilesystemLabel, err = config.GetLabelForUUID(volumeUUID)
+						// This is a not known filesystem label, so we will try to unlock by uuid or by partition label
+						// Notice that we lock by uuid and filesystem label so the label usually wont match between the fs label and partition label
+						// Unless set by the user to be the same one
 						if err != nil {
-							return err
+							if p.FilesystemLabel == "" || p.FilesystemLabel == "unknown" {
+								p.FilesystemLabel = p.Label
+							}
+							logger.Warn().Msg("Not known filesystem label, will try to unlock by uuid or by partition label")
 						}
 						err = UnlockDisk(p)
 						if err != nil {
