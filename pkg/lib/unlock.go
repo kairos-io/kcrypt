@@ -3,7 +3,6 @@ package lib
 import (
 	"fmt"
 	"path/filepath"
-	"strings"
 
 	"github.com/anatol/luks.go"
 	"github.com/jaypipes/ghw"
@@ -11,7 +10,6 @@ import (
 	"github.com/kairos-io/kairos-sdk/types"
 	"github.com/kairos-io/kairos-sdk/utils"
 	"github.com/kairos-io/kcrypt/pkg/bus"
-	configpkg "github.com/kairos-io/kcrypt/pkg/config"
 	"github.com/mudler/go-pluggable"
 )
 
@@ -25,11 +23,6 @@ func UnlockAll(tpm bool) error {
 func UnlockAllWithLogger(tpm bool, log types.KairosLogger) error {
 	bus.Manager.Initialize()
 	logger := log.Logger
-
-	config, err := configpkg.GetConfiguration(configpkg.ConfigScanDirs)
-	if err != nil {
-		logger.Info().Msgf("Warning: Could not read kcrypt configuration '%s'\n", err.Error())
-	}
 
 	blk, err := ghw.Block()
 	if err != nil {
@@ -49,36 +42,22 @@ func UnlockAllWithLogger(tpm bool, log types.KairosLogger) error {
 	for _, disk := range blk.Disks {
 		for _, p := range disk.Partitions {
 			if p.Type == "crypto_LUKS" {
-				// Get the luks UUID directly from cryptsetup
-				volumeUUID, err := utils.SH(fmt.Sprintf("cryptsetup luksUUID %s", filepath.Join("/dev", p.Name)))
-				logger.Info().Msgf("Got luks UUID %s for partition %s\n", volumeUUID, p.Name)
-				if err != nil {
-					return err
-				}
-				volumeUUID = strings.TrimSpace(volumeUUID)
-				if volumeUUID == "" {
-					logger.Warn().Msgf("No uuid for %s, skipping\n", p.Name)
-					continue
-				}
 				// Check if device is already mounted
 				// We mount it under /dev/mapper/DEVICE, so It's pretty easy to check
 				if !utils.Exists(filepath.Join("/dev", "mapper", p.Name)) {
-					logger.Info().Msgf("Unmounted Luks found at '%s' \n", filepath.Join("/dev", p.Name))
+					logger.Info().Msgf("Unmounted Luks found at '%s'", filepath.Join("/dev", p.Name))
 					if tpm {
 						out, err := utils.SH(fmt.Sprintf("/usr/lib/systemd/systemd-cryptsetup attach %s %s - tpm2-device=auto", p.Name, filepath.Join("/dev", p.Name)))
 						if err != nil {
-							logger.Warn().Msgf("Unlocking failed: '%s'\n", err.Error())
-							logger.Warn().Msgf("Unlocking failed, command output: '%s'\n", out)
+							logger.Warn().Msgf("Unlocking failed: '%s'", err.Error())
+							logger.Warn().Msgf("Unlocking failed, command output: '%s'", out)
 						}
 					} else {
-						p.FilesystemLabel, err = config.GetLabelForUUID(volumeUUID)
-						if err != nil {
-							return err
-						}
 						err = UnlockDisk(p)
 						if err != nil {
-							logger.Warn().Msgf("Unlocking failed: '%s'\n", err.Error())
+							logger.Warn().Msgf("Unlocking failed: '%s'", err.Error())
 						}
+						logger.Info().Msg("Unlocking succeeded")
 					}
 				} else {
 					logger.Info().Msgf("Device %s seems to be mounted at %s, skipping\n", filepath.Join("/dev", p.Name), filepath.Join("/dev", "mapper", p.Name))
