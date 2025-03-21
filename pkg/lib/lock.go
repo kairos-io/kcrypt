@@ -128,6 +128,7 @@ func LuksifyMeasurements(label string, publicKeyPcrs []string, pcrs []string, lo
 	device := fmt.Sprintf("/dev/%s", part)
 
 	extraArgs := []string{"--uuid", uuid.NewV5(uuid.NamespaceURL, label).String()}
+	extraArgs = append(extraArgs, "--label", label)
 	extraArgs = append(extraArgs, argsCreate...)
 
 	if err := CreateLuks(device, pass, extraArgs...); err != nil {
