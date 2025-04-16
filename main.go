@@ -1,28 +1,30 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
+	"runtime"
 
 	"github.com/kairos-io/kairos-sdk/types"
 	"github.com/kairos-io/kcrypt/pkg/lib"
-	"github.com/urfave/cli/v2"
+	"github.com/urfave/cli/v3"
 )
 
 var Version = "v0.0.0-dev"
+var GitCommit = "none"
 
 func main() {
-	app := &cli.App{
+	log := types.NewKairosLogger("kcrypt", "info", false)
+	app := &cli.Command{
 		Name:        "kairos-kcrypt",
-		Version:     Version,
-		Authors:     []*cli.Author{&cli.Author{Name: "Ettore Di Giacinto"}},
+		Authors:     []any{"Ettore Di Giacinto"},
 		Usage:       "kairos escrow key agent component",
-		Description: ``,
-		UsageText:   ``,
+		Description: "",
+		UsageText:   "",
 		Copyright:   "Ettore Di Giacinto",
 		Commands: []*cli.Command{
 			{
-
 				Name:        "encrypt",
 				Description: "Encrypts a partition",
 				Usage:       "Encrypts a partition",
@@ -34,35 +36,31 @@ func main() {
 					},
 					&cli.StringSliceFlag{
 						Name:  "tpm-pcrs",
-						Usage: "tpm pcrs to bind to (single measurement) . Only applies when --tpm is also set.",
+						Usage: "tpm pcrs to bind to (single measurement). Only applies when --tpm is also set.",
 					},
 					&cli.StringSliceFlag{
 						Name:  "public-key-pcrs",
 						Usage: "public key pcrs to bind to (policy). Only applies when --tpm is also set.",
-						Value: cli.NewStringSlice("11"),
+						Value: []string{"11"},
 					},
 				},
-				Action: func(c *cli.Context) error {
-					var err error
-					var out string
+				Action: func(ctx context.Context, c *cli.Command) error {
 					if c.NArg() != 1 {
 						return fmt.Errorf("requires 1 arg, the partition label")
 					}
-					log := types.NewKairosLogger("kcrypt-lock", "info", false)
+
+					var err error
 					if c.Bool("tpm") {
 						err = lib.LuksifyMeasurements(c.Args().First(), c.StringSlice("tpm-pcrs"), c.StringSlice("public-key-pcrs"), log)
 					} else {
-						out, err = lib.Luksify(c.Args().First(), log)
-						fmt.Println(out)
+						out, err := lib.Luksify(c.Args().First(), log)
+						if err == nil {
+							fmt.Println(out)
+						}
 					}
-					if err != nil {
-						return err
-					}
-
-					return nil
+					return err
 				},
 			},
-
 			{
 				Name:        "unlock-all",
 				UsageText:   "unlock-all",
@@ -75,35 +73,25 @@ func main() {
 						Usage: "Use TPM to unlock the partition",
 					},
 				},
-				Action: func(c *cli.Context) error {
-					return lib.UnlockAll(c.Bool("tpm"))
+				Action: func(ctx context.Context, c *cli.Command) error {
+					return lib.UnlockAllWithLogger(c.Bool("tpm"), log)
 				},
 			},
 			{
-
-				Name:   "extract-initrd",
-				Hidden: true,
-				Action: func(c *cli.Context) error {
-					if c.NArg() != 2 {
-						return fmt.Errorf("requires 3 args. initrd,, dst")
-					}
-					return lib.ExtractInitrd(c.Args().First(), c.Args().Get(1))
-				},
-			},
-			{
-				Name:   "inject-initrd",
-				Hidden: true,
-				Action: func(c *cli.Context) error {
-					if c.NArg() != 3 {
-						return fmt.Errorf("requires 3 args. initrd, srcfile, dst")
-					}
-					return lib.InjectInitrd(c.Args().First(), c.Args().Get(1), c.Args().Get(2))
+				Name:        "version",
+				UsageText:   "version",
+				Usage:       "Prints the version",
+				Description: "Prints the version",
+				ArgsUsage:   "kcrypt version",
+				Action: func(ctx context.Context, c *cli.Command) error {
+					log.Logger.Info().Str("commit", GitCommit).Str("goversion", runtime.Version()).Str("version", Version).Msg("Kcrypt")
+					return nil
 				},
 			},
 		},
 	}
 
-	if err := app.Run(os.Args); err != nil {
+	if err := app.Run(context.Background(), os.Args); err != nil {
 		fmt.Println(err.Error())
 		os.Exit(1)
 	}

@@ -14,7 +14,6 @@ import (
 	"github.com/jaypipes/ghw"
 	"github.com/jaypipes/ghw/pkg/block"
 	"github.com/kairos-io/kairos-sdk/types"
-	configpkg "github.com/kairos-io/kcrypt/pkg/config"
 )
 
 func CreateLuks(dev, password string, cryptsetupArgs ...string) error {
@@ -90,7 +89,7 @@ func Luksify(label string, logger types.KairosLogger, argsCreate ...string) (str
 		return "", err
 	}
 
-	return configpkg.PartitionToString(b), nil
+	return fmt.Sprintf("%s:%s:%s", b.FilesystemLabel, b.Name, b.UUID), nil
 }
 
 // LuksifyMeasurements takes a label and a list if public-keys and pcrs to bind and uses the measurements

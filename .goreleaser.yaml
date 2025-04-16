@@ -2,7 +2,7 @@
 version: 2
 builds:
   - ldflags:
-      - -w -s -X "main.Version={{.Tag}}"
+      - -w -s -X "main.Version={{.Tag}}" -X "main.GitCommit={{.Commit}}"
     env:
       - CGO_ENABLED=0
     goos:
@@ -13,7 +13,7 @@ builds:
     binary: '{{ .ProjectName }}'
     id: default
   - ldflags:
-      - -w -s -X "main.Version={{.Tag}}"
+      - -w -s -X "main.Version={{.Tag}}" -X "main.GitCommit={{.Commit}}"
     env:
       - CGO_ENABLED=1
       - GOEXPERIMENT=boringcrypto
@@ -27,7 +27,7 @@ builds:
       post:
         - bash -c 'set -e; go version {{.Path}} | grep boringcrypto || (echo "boringcrypto not found" && exit 1)'
   - ldflags:
-      - -w -s -X "main.Version={{.Tag}}"
+      - -w -s -X "main.Version={{.Tag}}" -X "main.GitCommit={{.Commit}}"
     env:
       - CGO_ENABLED=1
       - GOEXPERIMENT=boringcrypto
