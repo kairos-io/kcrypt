@@ -1,6 +1,8 @@
 version: "2"
 run:
   tests: false
+issues:
+  new: true
 linters:
   enable:
     - dupl
