@@ -73,7 +73,7 @@ func UnlockAllWithLogger(tpm bool, log types.KairosLogger) error {
 func UnlockDisk(b *block.Partition) error {
 	pass, err := GetPassword(b)
 	if err != nil {
-		return fmt.Errorf("error retriving password remotely: %w", err)
+		return fmt.Errorf("error retrieving password remotely: %w", err)
 	}
 
 	return LuksUnlock(filepath.Join("/dev", b.Name), b.Name, pass)

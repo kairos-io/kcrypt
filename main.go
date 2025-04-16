@@ -44,7 +44,7 @@ func main() {
 						Value: []string{"11"},
 					},
 				},
-				Action: func(ctx context.Context, c *cli.Command) error {
+				Action: func(_ context.Context, c *cli.Command) error {
 					if c.NArg() != 1 {
 						return fmt.Errorf("requires 1 arg, the partition label")
 					}
@@ -73,7 +73,7 @@ func main() {
 						Usage: "Use TPM to unlock the partition",
 					},
 				},
-				Action: func(ctx context.Context, c *cli.Command) error {
+				Action: func(_ context.Context, c *cli.Command) error {
 					return lib.UnlockAllWithLogger(c.Bool("tpm"), log)
 				},
 			},
@@ -83,7 +83,7 @@ func main() {
 				Usage:       "Prints the version",
 				Description: "Prints the version",
 				ArgsUsage:   "kcrypt version",
-				Action: func(ctx context.Context, c *cli.Command) error {
+				Action: func(_ context.Context, c *cli.Command) error {
 					log.Logger.Info().Str("commit", GitCommit).Str("goversion", runtime.Version()).Str("version", Version).Msg("Kcrypt")
 					return nil
 				},
