@@ -83,7 +83,7 @@ func main() {
 				Usage:       "Prints the version",
 				Description: "Prints the version",
 				ArgsUsage:   "kcrypt version",
-				Action: func(_ context.Context, c *cli.Command) error {
+				Action: func(_ context.Context, _ *cli.Command) error {
 					log.Logger.Info().Str("commit", GitCommit).Str("goversion", runtime.Version()).Str("version", Version).Msg("Kcrypt")
 					return nil
 				},
