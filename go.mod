@@ -6,7 +6,7 @@ require (
 	github.com/anatol/luks.go v0.0.0-20250316021219-8cd744c3576f
 	github.com/gofrs/uuid v4.4.0+incompatible
 	github.com/jaypipes/ghw v0.16.0
-	github.com/kairos-io/kairos-sdk v0.9.2
+	github.com/kairos-io/kairos-sdk v0.9.3
 	github.com/mudler/go-pluggable v0.0.0-20230126220627-7710299a0ae5
 	github.com/onsi/ginkgo/v2 v2.23.4
 	github.com/onsi/gomega v1.37.0
