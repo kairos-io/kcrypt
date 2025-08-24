@@ -5,7 +5,7 @@ go 1.24.2
 require (
 	github.com/anatol/luks.go v0.0.0-20250316021219-8cd744c3576f
 	github.com/gofrs/uuid v4.4.0+incompatible
-	github.com/jaypipes/ghw v0.17.0
+	github.com/jaypipes/ghw v0.19.0
 	github.com/kairos-io/kairos-sdk v0.9.4
 	github.com/mudler/go-pluggable v0.0.0-20230126220627-7710299a0ae5
 	github.com/onsi/ginkgo/v2 v2.25.1
@@ -64,7 +64,7 @@ require (
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/itchyny/gojq v0.12.17 // indirect
 	github.com/itchyny/timefmt-go v0.1.6 // indirect
-	github.com/jaypipes/pcidb v1.0.1 // indirect
+	github.com/jaypipes/pcidb v1.1.0 // indirect
 	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/jzelinskie/whirlpool v0.0.0-20201016144138-0675e54bb004 // indirect
 	github.com/klauspost/compress v1.17.11 // indirect
@@ -91,6 +91,7 @@ require (
 	github.com/wayneashleyberry/terminal-dimensions v1.1.0 // indirect
 	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect
 	github.com/xrash/smetrics v0.0.0-20240521201337-686a1a2994c1 // indirect
+	github.com/yusufpapurcu/wmi v1.2.4 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.59.0 // indirect
@@ -109,5 +110,5 @@ require (
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250212204824-5a70512c5d8b // indirect
 	google.golang.org/grpc v1.70.0 // indirect
 	google.golang.org/protobuf v1.36.7 // indirect
-	howett.net/plist v1.0.0 // indirect
+	howett.net/plist v1.0.2-0.20250314012144-ee69052608d9 // indirect
 )
