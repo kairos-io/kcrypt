@@ -23,7 +23,6 @@ require (
 	github.com/Masterminds/semver/v3 v3.4.0 // indirect
 	github.com/Microsoft/go-winio v0.6.2 // indirect
 	github.com/Microsoft/hcsshim v0.12.9 // indirect
-	github.com/StackExchange/wmi v1.2.1 // indirect
 	github.com/anatol/devmapper.go v0.0.0-20230829043248-59ac2b9706ba // indirect
 	github.com/avast/retry-go v3.0.0+incompatible // indirect
 	github.com/aybabtme/rgbterm v0.0.0-20170906152045-cc83f3b3ce59 // indirect
@@ -44,7 +43,7 @@ require (
 	github.com/distribution/reference v0.6.0 // indirect
 	github.com/docker/cli v27.5.0+incompatible // indirect
 	github.com/docker/distribution v2.8.3+incompatible // indirect
-	github.com/docker/docker v27.5.1+incompatible // indirect
+	github.com/docker/docker v28.0.0+incompatible // indirect
 	github.com/docker/docker-credential-helpers v0.8.2 // indirect
 	github.com/docker/go-connections v0.5.0 // indirect
 	github.com/docker/go-units v0.5.0 // indirect
